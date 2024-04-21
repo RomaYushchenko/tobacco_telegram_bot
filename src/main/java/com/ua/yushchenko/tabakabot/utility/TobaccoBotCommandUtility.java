@@ -6,8 +6,7 @@ import static com.ua.yushchenko.tabakabot.model.enums.TobaccoBotCommand.LOAD_420
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 import com.ua.yushchenko.tabakabot.model.enums.TobaccoBotCommand;
 import org.springframework.util.CollectionUtils;
@@ -55,7 +54,8 @@ public class TobaccoBotCommandUtility {
             return false;
         }
 
-        return !CollectionUtils.isEmpty(getMessageEntitiesByCommandType(message, BOT_COMMAND, LOAD_420_LIGHT, LOAD_420_CLASSIC));
+        return !CollectionUtils.isEmpty(
+                getMessageEntitiesByCommandType(message, BOT_COMMAND, LOAD_420_LIGHT, LOAD_420_CLASSIC));
     }
 
     /**
@@ -69,8 +69,7 @@ public class TobaccoBotCommandUtility {
                                                                       final TobaccoBotCommand... botCommand) {
         return message.getEntities()
                       .stream()
-                      .filter(messageEntity -> Arrays.asList(botCommand)
-                                                     .stream()
+                      .filter(messageEntity -> Arrays.stream(botCommand)
                                                      .map(TobaccoBotCommand::getCommandString)
                                                      .toList()
                                                      .contains(messageEntity.getType()))
@@ -90,5 +89,40 @@ public class TobaccoBotCommandUtility {
                 .stream()
                 .findFirst()
                 .orElse(null);
+    }
+
+    /**
+     * Gets first text of Telegram message entity and convert to TobaccoBotCommand
+     *
+     * @param message Telegram message Entity
+     * @return first text of Telegram message entity
+     */
+    public static String getFirstTextOfMessageEntityBotCommand(final Message message) {
+        final String botCommand =
+                Optional.ofNullable(findFirstMessageEntityByCommandType(message, BOT_COMMAND))
+                        .map(MessageEntity::getText)
+                        .orElse(null);
+
+        if (botCommand == null) {
+            return null;
+        }
+
+        final String[] splitBotCommand = botCommand.split("/");
+        return splitBotCommand[1];
+    }
+
+    /**
+     * Gets first {@link TobaccoBotCommand}
+     *
+     * @param data Tobacco bot command
+     * @return {@link TobaccoBotCommand}
+     */
+    public static TobaccoBotCommand getFirstTobaccoBotCommand(final String data) {
+        if (data.contains(":")) {
+            final String[] splitCommands = data.split(":");
+            return TobaccoBotCommand.getEnumByString(splitCommands[0]);
+        }
+
+        return TobaccoBotCommand.getEnumByString(data);
     }
 }

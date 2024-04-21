@@ -1,13 +1,12 @@
 package com.ua.yushchenko.tabakabot.processor;
 
-import static com.ua.yushchenko.tabakabot.model.enums.TobaccoBotCommand.BOT_COMMAND;
 import static com.ua.yushchenko.tabakabot.model.enums.TobaccoBotCommand.LOAD_420_CLASSIC;
 import static com.ua.yushchenko.tabakabot.model.enums.TobaccoBotCommand.LOAD_420_LIGHT;
 import static com.ua.yushchenko.tabakabot.model.enums.TobaccoBotCommand.START;
 import static com.ua.yushchenko.tabakabot.model.enums.TobaccoBotCommand.getEnumByString;
+import static com.ua.yushchenko.tabakabot.utility.TobaccoBotCommandUtility.getFirstTextOfMessageEntityBotCommand;
 
 import java.util.Objects;
-import java.util.Optional;
 
 import com.ua.yushchenko.tabakabot.builder.InformationMessageBuilder;
 import com.ua.yushchenko.tabakabot.builder.ui.admin.LoadTobaccoBuilder;
@@ -18,14 +17,11 @@ import com.ua.yushchenko.tabakabot.utility.TobaccoBotCommandUtility;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
-import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.bots.TelegramWebhookBot;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Message;
-import org.telegram.telegrambots.meta.api.objects.MessageEntity;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
@@ -115,9 +111,10 @@ public class TobaccoAdminBotProcessor extends TelegramWebhookBot {
                             return null;
                         }
 
-                        switch (secondCommand) {
-                            case START -> execute(menuBuilder.buildTobaccoAdminMenu(chatId, messageId));
-                            default -> log.error("Unhandled second command: {}", secondCommand);
+                        if (secondCommand == START) {
+                            execute(menuBuilder.buildTobaccoAdminMenu(chatId, messageId));
+                        } else {
+                            log.error("Unhandled second command: {}", secondCommand);
                         }
 
                         return null;
@@ -132,16 +129,6 @@ public class TobaccoAdminBotProcessor extends TelegramWebhookBot {
         }
 
         return null;
-    }
-
-    private static String getFirstTextOfMessageEntityBotCommand(final Message message) {
-        final String botCommand =
-                Optional.ofNullable(TobaccoBotCommandUtility.findFirstMessageEntityByCommandType(message, BOT_COMMAND))
-                        .map(MessageEntity::getText)
-                        .orElse(null);
-
-        final String[] splitBotCommand = botCommand.split("/");
-        return splitBotCommand[1];
     }
 
     @Override
