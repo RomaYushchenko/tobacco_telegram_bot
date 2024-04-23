@@ -2,6 +2,7 @@ package com.ua.yushchenko.tabakabot.processor;
 
 import static com.ua.yushchenko.tabakabot.model.enums.ItemType.TOBACCO_420_CLASSIC;
 import static com.ua.yushchenko.tabakabot.model.enums.ItemType.TOBACCO_420_LIGHT;
+import static com.ua.yushchenko.tabakabot.model.enums.OrderStatus.PLANNED;
 import static com.ua.yushchenko.tabakabot.model.enums.TobaccoBotCommand.START;
 import static com.ua.yushchenko.tabakabot.model.enums.TobaccoBotCommand.getEnumByString;
 import static com.ua.yushchenko.tabakabot.utility.TobaccoBotCommandUtility.getFirstTextOfMessageEntityBotCommand;
@@ -140,12 +141,14 @@ public class TobaccoClientBotProcessor extends TelegramWebhookBot {
                         log.info("onUpdateReceived.X: Finish processing {} command", tobaccoBotCommand);
                     }
                     case SEND_ORDER_REQUEST -> {
-                        final List<Order> ordersByUserId = orderService.getOrdersByUserId(user.getUserID())
-                                                                       .stream()
-                                                                       .map(order -> order.toBuilder()
-                                                                                          .orderStatus(OrderStatus.ORDERED)
-                                                                                          .build())
-                                                                       .toList();
+                        final List<Order> ordersByUserId =
+                                orderService.getOrdersByUserId(user.getUserID())
+                                            .stream()
+                                            .filter(order -> Objects.equals(order.getOrderStatus(), PLANNED))
+                                            .map(order -> order.toBuilder()
+                                                               .orderStatus(OrderStatus.ORDERED)
+                                                               .build())
+                                            .toList();
 
                         orderService.updateOrders(ordersByUserId);
 
