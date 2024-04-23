@@ -22,6 +22,7 @@ public enum TobaccoBotCommand {
     SEND_ORDER_REQUEST("send_order_request"),
     BACK("back"),
     REMOVE_ORDER("remove_order"),
+    ORDER_STATUS("order_status"),
 
     //ADMIN COMMANDS
     GET_ALL_ORDERS("get_all_orders"),

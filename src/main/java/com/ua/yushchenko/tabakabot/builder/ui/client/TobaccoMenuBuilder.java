@@ -2,6 +2,7 @@ package com.ua.yushchenko.tabakabot.builder.ui.client;
 
 import static com.ua.yushchenko.tabakabot.model.enums.TobaccoBotCommand.COAL;
 import static com.ua.yushchenko.tabakabot.model.enums.TobaccoBotCommand.ORDER_LIST;
+import static com.ua.yushchenko.tabakabot.model.enums.TobaccoBotCommand.ORDER_STATUS;
 import static com.ua.yushchenko.tabakabot.model.enums.TobaccoBotCommand.SEND_ORDER_REQUEST;
 
 import java.util.ArrayList;
@@ -90,6 +91,7 @@ public class TobaccoMenuBuilder {
         mainMenuButtons.add(buildCoalItemButtons());
         mainMenuButtons.add(buildOrderListButtons());
         mainMenuButtons.add(buildSendOrderRequestButtons());
+        mainMenuButtons.add(buildOrderStatusButtons());
 
         return mainMenuButtons;
     }
@@ -113,5 +115,10 @@ public class TobaccoMenuBuilder {
     private List<InlineKeyboardButton> buildSendOrderRequestButtons() {
         return List.of(buttonBuilder.buildButton(EmojiParser.parseToUnicode(":incoming_envelope: Send Order"),
                                                  SEND_ORDER_REQUEST));
+    }
+
+    private List<InlineKeyboardButton> buildOrderStatusButtons() {
+        return List.of(buttonBuilder.buildButton(EmojiParser.parseToUnicode(":hourglass_flowing_sand: Order Status"),
+                                                 ORDER_STATUS));
     }
 }

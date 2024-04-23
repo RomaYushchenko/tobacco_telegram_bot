@@ -16,6 +16,7 @@ import com.ua.yushchenko.tabakabot.builder.ui.client.TobaccoMenuBuilder;
 import com.ua.yushchenko.tabakabot.builder.ui.client.TobaccoOrderCoalMenuBuilder;
 import com.ua.yushchenko.tabakabot.builder.ui.client.TobaccoOrderListMenuBuilder;
 import com.ua.yushchenko.tabakabot.builder.ui.client.TobaccoOrderMenuBuilder;
+import com.ua.yushchenko.tabakabot.builder.ui.client.TobaccoOrderStatusMenuBuilder;
 import com.ua.yushchenko.tabakabot.builder.ui.client.TobaccoSendOrderRequestMenuBuilder;
 import com.ua.yushchenko.tabakabot.model.domain.Order;
 import com.ua.yushchenko.tabakabot.model.domain.User;
@@ -53,6 +54,7 @@ public class TobaccoClientBotProcessor extends TelegramWebhookBot {
     private final TobaccoOrderListMenuBuilder tobaccoOrderListMenuBuilder;
     private final TobaccoSendOrderRequestMenuBuilder tobaccoSendOrderRequestMenuBuilder;
     private final TobaccoOrderCoalMenuBuilder tobaccoOrderCoalMenuBuilder;
+    private final TobaccoOrderStatusMenuBuilder tobaccoOrderStatusMenuBuilder;
 
     @Getter
     private final String botToken;
@@ -157,6 +159,10 @@ public class TobaccoClientBotProcessor extends TelegramWebhookBot {
                         orderService.removeOrder(userId, tobaccoItemId);
 
                         execute(tobaccoOrderListMenuBuilder.buildRemoveTobaccoOrderListMenu(chatId, messageId, user));
+                    }
+                    case ORDER_STATUS -> {
+                        execute(tobaccoOrderStatusMenuBuilder.buildOrderStatusMenu(chatId, messageId, user));
+                        log.info("onUpdateReceived.X: Finish processing {} command", tobaccoBotCommand);
                     }
                     case BACK -> {
                         final String[] splitBotCommand = data.split(":");
