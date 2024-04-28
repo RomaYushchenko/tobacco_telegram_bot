@@ -3,8 +3,7 @@ package com.ua.yushchenko.tabakabot.builder.ui.admin;
 import static com.ua.yushchenko.tabakabot.model.enums.TobaccoBotCommand.GET_ALL_ORDERS;
 import static com.ua.yushchenko.tabakabot.model.enums.TobaccoBotCommand.GET_ALL_ORDERS_BY_USER;
 import static com.ua.yushchenko.tabakabot.model.enums.TobaccoBotCommand.GET_ALL_USERS;
-import static com.ua.yushchenko.tabakabot.model.enums.TobaccoBotCommand.LOAD_420_CLASSIC;
-import static com.ua.yushchenko.tabakabot.model.enums.TobaccoBotCommand.LOAD_420_LIGHT;
+import static com.ua.yushchenko.tabakabot.model.enums.TobaccoBotCommand.PROCESSING_ORDERS_MENU;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -61,8 +60,14 @@ public class MenuBuilder {
         final List<InlineKeyboardButton> userList =
                 List.of(buttonBuilder.buildButton(EmojiParser.parseToUnicode(":incoming_envelope: Gat All users"),
                                                   GET_ALL_USERS));
+
+        final List<InlineKeyboardButton> processingOrder =
+                List.of(buttonBuilder.buildButton(EmojiParser.parseToUnicode(":hourglass_flowing_sand: Processing order"),
+                                                  PROCESSING_ORDERS_MENU));
+
         mainMenuButtons.add(ordersList);
         mainMenuButtons.add(userList);
+        mainMenuButtons.add(processingOrder);
 
         return mainMenuButtons;
     }

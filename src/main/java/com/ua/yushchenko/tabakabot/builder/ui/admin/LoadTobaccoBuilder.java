@@ -3,39 +3,25 @@ package com.ua.yushchenko.tabakabot.builder.ui.admin;
 
 import static com.ua.yushchenko.tabakabot.model.enums.ItemType.TOBACCO_420_CLASSIC;
 import static com.ua.yushchenko.tabakabot.model.enums.ItemType.TOBACCO_420_LIGHT;
-import static com.ua.yushchenko.tabakabot.model.enums.TobaccoBotCommand.BACK;
-import static com.ua.yushchenko.tabakabot.model.enums.TobaccoBotCommand.START;
-import static com.ua.yushchenko.tabakabot.utility.TobaccoBotCommandUtility.mergeBotCommand;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 
-import com.ua.yushchenko.tabakabot.builder.ui.InlineButtonBuilder;
 import com.ua.yushchenko.tabakabot.model.domain.Item;
-import com.ua.yushchenko.tabakabot.model.domain.Tobacco;
-import com.ua.yushchenko.tabakabot.model.enums.ItemType;
-import com.ua.yushchenko.tabakabot.model.enums.TobaccoBotCommand;
 import com.ua.yushchenko.tabakabot.service.ItemService;
-import com.vdurmont.emoji.EmojiParser;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.Message;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
 @Log4j2
 @Component
 @RequiredArgsConstructor
 public class LoadTobaccoBuilder {
 
-    @NonNull
-    private final InlineButtonBuilder buttonBuilder;
     @NonNull
     private final ItemService itemService;
 
@@ -62,6 +48,9 @@ public class LoadTobaccoBuilder {
                                                       .build();
                                        })
                                        .toList();
+
+        itemService.getItemsByType(TOBACCO_420_LIGHT)
+                   .forEach(itemService::removeItem);
 
         items.forEach(itemService::saveItem);
 
@@ -95,11 +84,14 @@ public class LoadTobaccoBuilder {
                                        })
                                        .toList();
 
+        itemService.getItemsByType(TOBACCO_420_CLASSIC)
+                   .forEach(itemService::removeItem);
+
         items.forEach(itemService::saveItem);
 
         return SendMessage.builder()
-                   .chatId(chatId)
-                   .text(TOBACCO_420_CLASSIC.getItemString() + " was loaded")
-                   .build();
+                          .chatId(chatId)
+                          .text(TOBACCO_420_CLASSIC.getItemString() + " was loaded")
+                          .build();
     }
 }

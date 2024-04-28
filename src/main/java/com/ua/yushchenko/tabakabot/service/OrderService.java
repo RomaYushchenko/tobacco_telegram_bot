@@ -2,13 +2,11 @@ package com.ua.yushchenko.tabakabot.service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
 import com.ua.yushchenko.tabakabot.model.domain.Order;
-import com.ua.yushchenko.tabakabot.model.domain.Tobacco;
 import com.ua.yushchenko.tabakabot.model.enums.OrderStatus;
 import com.ua.yushchenko.tabakabot.model.mapper.OrderMapper;
 import com.ua.yushchenko.tabakabot.model.persistence.OrderDb;
@@ -39,9 +37,8 @@ public class OrderService {
      *
      * @param userId        ID of user
      * @param tobaccoItemId ID of tobacco item
-     * @return order by user and tobacco item
      */
-    public Order addOrderToUser(final long userId, final long tobaccoItemId) {
+    public void addOrderToUser(final long userId, final long tobaccoItemId) {
         log.info("addOrderToUser.E: User {} add order item {}", userId, tobaccoItemId);
 
         final Order orderToCreate = Order.builder()
@@ -55,7 +52,6 @@ public class OrderService {
         final Order order = orderMapper.dbToDomain(createdOrder);
 
         log.info("addOrderToUser.X: User {} add order {}", userId, order);
-        return order;
     }
 
     /**
@@ -121,7 +117,7 @@ public class OrderService {
     public void removeOrder(final Long userId, final Long tobaccoItemId) {
         log.info("removeOrder.E: User ID: {}, tobacco item ID: {}", userId, tobaccoItemId);
 
-        final OrderDb orderDb = orderRepository.findAllByUserIdAndAndTobaccoItemId(userId, tobaccoItemId)
+        final OrderDb orderDb = orderRepository.findAllByUserIdAndTobaccoItemId(userId, tobaccoItemId)
                                                .stream()
                                                .findFirst()
                                                .orElse(null);
@@ -144,6 +140,19 @@ public class OrderService {
 
         orderRepository.findAll()
                          .forEach(orderDb -> orders.add(orderMapper.dbToDomain(orderDb)));
+
+        return orders;
+    }
+
+    public List<Order> getOrderByStatus(final OrderStatus orderStatus) {
+        final List<Order> orders = new ArrayList<>();
+
+        orderRepository.findAll()
+                       .forEach(orderDb -> {
+                           if (Objects.equals(orderDb.getOrderStatus(), orderStatus)){
+                               orders.add(orderMapper.dbToDomain(orderDb));
+                           }
+                       });
 
         return orders;
     }

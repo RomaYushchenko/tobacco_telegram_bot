@@ -4,9 +4,7 @@ import java.util.List;
 
 import com.ua.yushchenko.tabakabot.model.enums.OrderStatus;
 import com.ua.yushchenko.tabakabot.model.persistence.OrderDb;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -32,9 +30,8 @@ public interface OrderRepository extends CrudRepository<OrderDb, Long> {
      * @param userId ID of user
      * @return list of {@link OrderDb} by ID of user
      */
-    //@Query("SELECT r FROM OrderDb r WHERE r.orderStatus = :#{#orderStatus} AND r.userId = :userId")
-    List<OrderDb> findAllByUserIdAndOrderStatus(final /*@Param("userId")*/ long userId,
-                                                final /*@Param("orderStatus")*/ OrderStatus orderStatus);
+    List<OrderDb> findAllByUserIdAndOrderStatus(final long userId,
+                                                final OrderStatus orderStatus);
 
     /**
      * Find all {@link OrderDb} by ID of user and ID of tobacco item
@@ -43,5 +40,5 @@ public interface OrderRepository extends CrudRepository<OrderDb, Long> {
      * @param tobaccoItemId ID of tobacco item
      * @return list of {@link OrderDb} by ID of user and ID of tobacco item
      */
-    List<OrderDb> findAllByUserIdAndAndTobaccoItemId(final long userId, final long tobaccoItemId);
+    List<OrderDb> findAllByUserIdAndTobaccoItemId(final long userId, final long tobaccoItemId);
 }

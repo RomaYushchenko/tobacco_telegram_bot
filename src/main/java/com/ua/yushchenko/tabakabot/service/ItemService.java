@@ -33,16 +33,14 @@ public class ItemService {
      * Save item
      *
      * @param itemToSave item to save
-     * @return {@link Item}
      */
-    public Item saveItem(final Item itemToSave) {
+    public void saveItem(final Item itemToSave) {
         log.info("saveItem.E: Item to save: {}", itemToSave);
 
         final var createdItem = itemRepository.save(itemMapper.domainToDb(itemToSave));
         final var item = itemMapper.dbToDomain(createdItem);
 
         log.info("saveItem.X: Created tobacco item: {}", item);
-        return item;
     }
 
     /**
@@ -92,5 +90,18 @@ public class ItemService {
         itemRepository.findAll()
                       .forEach(itemDb -> items.add(itemMapper.dbToDomain(itemDb)));
         return items;
+    }
+
+    /**
+     * Remove item
+     *
+     * @param itemToSave item to remove
+     */
+    public void removeItem(final Item itemToSave) {
+        log.info("removeItem.E: Item to remove: {}", itemToSave);
+
+        itemRepository.delete(itemMapper.domainToDb(itemToSave));
+
+        log.info("removeItem.X:");
     }
 }

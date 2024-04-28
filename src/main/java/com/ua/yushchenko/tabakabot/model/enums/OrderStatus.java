@@ -11,5 +11,5 @@ public enum OrderStatus {
     PLANNED,
     ORDERED,
     COMPLETED,
-    PAINTING_REMOVE;
+    REJECTED
 }

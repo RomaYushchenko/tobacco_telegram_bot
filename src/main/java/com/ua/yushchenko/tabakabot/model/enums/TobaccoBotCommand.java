@@ -1,5 +1,7 @@
 package com.ua.yushchenko.tabakabot.model.enums;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -29,7 +31,12 @@ public enum TobaccoBotCommand {
     GET_ALL_ORDERS_BY_USER("get_all_orders_by_user"),
     GET_ALL_USERS("get_all_users"),
     LOAD_420_LIGHT("load_420_light"),
-    LOAD_420_CLASSIC("load_420_classic");
+    LOAD_420_CLASSIC("load_420_classic"),
+    PROCESSING_ORDERS_MENU("pom"),
+    PLANNED_MENU("pm"),
+    REJECT_MENU("rm"),
+    ORDERED_MENU("om"),
+    COMPLETED_ORDER_MENU("com");
 
 
     private final String commandString;
@@ -58,6 +65,33 @@ public enum TobaccoBotCommand {
         }
 
         return null;
+    }
+
+    public static List<Object> getListCommandsByString(final String commandsString) {
+        if (!commandsString.contains(":")) {
+            final TobaccoBotCommand enumByString = getEnumByString(commandsString);
+
+            return Objects.nonNull(enumByString)
+                    ? List.of(enumByString)
+                    : List.of();
+        }
+
+        final List<Object> tobaccoBotCommands = new ArrayList<>();
+
+        final String[] splitBotCommands = commandsString.split(":");
+
+        for (final String splitBotCommand : splitBotCommands) {
+            final TobaccoBotCommand enumByString = getEnumByString(splitBotCommand);
+
+            if (Objects.nonNull(enumByString)) {
+                tobaccoBotCommands.add(enumByString);
+            } else {
+                tobaccoBotCommands.add(Long.valueOf(splitBotCommand));
+            }
+
+        }
+
+        return tobaccoBotCommands;
     }
 
     public String getCommandString() {

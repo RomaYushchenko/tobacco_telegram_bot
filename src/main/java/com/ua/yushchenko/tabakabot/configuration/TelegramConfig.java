@@ -4,6 +4,7 @@ import com.ua.yushchenko.tabakabot.builder.InformationMessageBuilder;
 import com.ua.yushchenko.tabakabot.builder.ui.admin.LoadTobaccoBuilder;
 import com.ua.yushchenko.tabakabot.builder.ui.admin.MenuBuilder;
 import com.ua.yushchenko.tabakabot.builder.ui.admin.OrderListBuilder;
+import com.ua.yushchenko.tabakabot.builder.ui.admin.ProcessOrderMenuBuilder;
 import com.ua.yushchenko.tabakabot.builder.ui.client.TobaccoMenuBuilder;
 import com.ua.yushchenko.tabakabot.builder.ui.client.TobaccoOrderCoalMenuBuilder;
 import com.ua.yushchenko.tabakabot.builder.ui.client.TobaccoOrderListMenuBuilder;
@@ -63,6 +64,8 @@ public class TelegramConfig {
     private final TobaccoOrderCoalMenuBuilder tobaccoOrderCoalMenuBuilder;
     @NonNull
     private final TobaccoOrderStatusMenuBuilder tobaccoOrderStatusMenuBuilder;
+    @NonNull
+    private final ProcessOrderMenuBuilder processOrderMenuBuilder;
 
 
     @Value("${telegram.tobacco.clint.bot.token}")
@@ -123,6 +126,8 @@ public class TelegramConfig {
                                             menuBuilder,
                                             orderListBuilder,
                                             loadTobaccoBuilder,
+                                            processOrderMenuBuilder,
+                                            orderService,
                                             tobaccoAdminBotToken);
     }
 }

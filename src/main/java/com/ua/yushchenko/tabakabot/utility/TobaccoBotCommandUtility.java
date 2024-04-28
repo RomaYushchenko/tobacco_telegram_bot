@@ -33,6 +33,36 @@ public class TobaccoBotCommandUtility {
     }
 
     /**
+     * Merge three {@link TobaccoBotCommand}
+     *
+     * @param firstCommand  first bot command
+     * @param secondCommand second bot command
+     * @return merged two {@link TobaccoBotCommand}. Ex: firstCommand:secondCommand:thredCommand
+     */
+    public static String mergeBotCommand(final TobaccoBotCommand firstCommand,
+                                         final TobaccoBotCommand secondCommand,
+                                         final TobaccoBotCommand theredCommand) {
+        return firstCommand.getCommandString() + ":" + secondCommand.getCommandString() +
+                ":" + theredCommand.getCommandString();
+    }
+
+    /**
+     * Merge three {@link TobaccoBotCommand}
+     *
+     * @param firstCommand  first bot command
+     * @param secondCommand second bot command
+     * @return merged two {@link TobaccoBotCommand}. Ex: firstCommand:secondCommand:thredCommand
+     */
+    public static String mergeBotCommand(final TobaccoBotCommand firstCommand,
+                                         final TobaccoBotCommand secondCommand,
+                                         final TobaccoBotCommand theredCommand,
+                                         final Long userId) {
+        return firstCommand.getCommandString() + ":" + secondCommand.getCommandString() +
+                ":" + theredCommand.getCommandString() +
+                ":" + userId;
+    }
+
+    /**
      * Merge {@link TobaccoBotCommand} with tobacco item
      *
      * @param firstCommand  first bot command
