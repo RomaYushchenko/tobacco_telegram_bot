@@ -109,15 +109,16 @@ public class OrderService {
     }
 
     /**
-     * Remove {@link Order} by user and tobacco item IDs
+     * Remove planned {@link Order} by user and tobacco item IDs
      *
      * @param userId        ID of user
      * @param tobaccoItemId ID of tobacco item
      */
-    public void removeOrder(final Long userId, final Long tobaccoItemId) {
+    public void removePlannedOrder(final Long userId, final Long tobaccoItemId) {
         log.info("removeOrder.E: User ID: {}, tobacco item ID: {}", userId, tobaccoItemId);
 
-        final OrderDb orderDb = orderRepository.findAllByUserIdAndTobaccoItemId(userId, tobaccoItemId)
+        final OrderDb orderDb = orderRepository.findAllByUserIdAndTobaccoItemIdAndOrderStatus(userId, tobaccoItemId,
+                                                                                              OrderStatus.PLANNED)
                                                .stream()
                                                .findFirst()
                                                .orElse(null);

@@ -1,6 +1,7 @@
 package com.ua.yushchenko.tabakabot.service;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -78,7 +79,7 @@ public class ItemService {
         return item;
     }
 
-    public List<Item> getItemsByIds(final List<Long> itemIds) {
+    public List<Item> getItemsByIds(final Collection<Long> itemIds) {
         return itemRepository.findAllByItemIdIsIn(itemIds)
                              .stream()
                              .map(itemMapper::dbToDomain)

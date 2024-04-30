@@ -40,5 +40,6 @@ public interface OrderRepository extends CrudRepository<OrderDb, Long> {
      * @param tobaccoItemId ID of tobacco item
      * @return list of {@link OrderDb} by ID of user and ID of tobacco item
      */
-    List<OrderDb> findAllByUserIdAndTobaccoItemId(final long userId, final long tobaccoItemId);
+    List<OrderDb> findAllByUserIdAndTobaccoItemIdAndOrderStatus(final long userId, final long tobaccoItemId,
+                                                                final OrderStatus orderStatus);
 }

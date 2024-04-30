@@ -142,6 +142,26 @@ public class TobaccoBotCommandUtility {
     }
 
     /**
+     * Gets first text of Telegram message entity and convert to TobaccoBotCommand
+     *
+     * @param message Telegram message Entity
+     * @return first text of Telegram message entity
+     */
+    public static TobaccoBotCommand getFirstCommandOfMessageEntityBotCommand(final Message message) {
+        final String botCommand =
+                Optional.ofNullable(findFirstMessageEntityByCommandType(message, BOT_COMMAND))
+                        .map(MessageEntity::getText)
+                        .orElse(null);
+
+        if (botCommand == null) {
+            return null;
+        }
+
+        final String[] splitBotCommand = botCommand.split("/");
+        return TobaccoBotCommand.getEnumByString(splitBotCommand[1]);
+    }
+
+    /**
      * Gets first {@link TobaccoBotCommand}
      *
      * @param data Tobacco bot command

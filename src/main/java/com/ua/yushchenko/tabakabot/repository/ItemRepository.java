@@ -1,5 +1,6 @@
 package com.ua.yushchenko.tabakabot.repository;
 
+import java.util.Collection;
 import java.util.List;
 
 import com.ua.yushchenko.tabakabot.model.enums.ItemType;
@@ -38,5 +39,5 @@ public interface ItemRepository extends CrudRepository<ItemDb, Long> {
      * @param itemIds List of IDs of item
      * @return list of {@link  ItemDb} by list of IDs of item
      */
-    List<ItemDb> findAllByItemIdIsIn(final List<Long> itemIds);
+    List<ItemDb> findAllByItemIdIsIn(final Collection<Long> itemIds);
 }

@@ -5,7 +5,6 @@ import com.ua.yushchenko.tabakabot.processor.TobaccoClientBotProcessor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,7 +30,7 @@ public class BotController {
             return ResponseEntity.ok()
                                  .build();
         } catch (Exception e) {
-            log.error("Uncheced error", e);
+            log.error("Unhandled error", e);
             return ResponseEntity.badRequest()
                                  .build();
         }
@@ -46,7 +45,7 @@ public class BotController {
             return ResponseEntity.ok()
                                  .build();
         } catch (Exception e) {
-            log.error("Uncheced error", e);
+            log.error("Unhandled error", e);
             return ResponseEntity.badRequest()
                                  .build();
         }

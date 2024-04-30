@@ -1,34 +1,22 @@
 package com.ua.yushchenko.tabakabot.processor;
 
-import static com.ua.yushchenko.tabakabot.model.enums.ItemType.TOBACCO_420_CLASSIC;
-import static com.ua.yushchenko.tabakabot.model.enums.ItemType.TOBACCO_420_LIGHT;
-import static com.ua.yushchenko.tabakabot.model.enums.OrderStatus.PLANNED;
-import static com.ua.yushchenko.tabakabot.model.enums.TobaccoBotCommand.START;
-import static com.ua.yushchenko.tabakabot.model.enums.TobaccoBotCommand.getEnumByString;
-import static com.ua.yushchenko.tabakabot.utility.TobaccoBotCommandUtility.getFirstTextOfMessageEntityBotCommand;
+import static com.ua.yushchenko.tabakabot.utility.TobaccoBotCommandUtility.getFirstCommandOfMessageEntityBotCommand;
 import static com.ua.yushchenko.tabakabot.utility.TobaccoBotCommandUtility.getFirstTobaccoBotCommand;
 import static com.ua.yushchenko.tabakabot.utility.TobaccoBotCommandUtility.isTobaccoBotCommand;
 
-import java.util.List;
 import java.util.Objects;
 
 import com.ua.yushchenko.tabakabot.builder.InformationMessageBuilder;
-import com.ua.yushchenko.tabakabot.builder.ui.client.TobaccoMenuBuilder;
-import com.ua.yushchenko.tabakabot.builder.ui.client.TobaccoOrderCoalMenuBuilder;
-import com.ua.yushchenko.tabakabot.builder.ui.client.TobaccoOrderListMenuBuilder;
-import com.ua.yushchenko.tabakabot.builder.ui.client.TobaccoOrderMenuBuilder;
-import com.ua.yushchenko.tabakabot.builder.ui.client.TobaccoOrderStatusMenuBuilder;
-import com.ua.yushchenko.tabakabot.builder.ui.client.TobaccoSendOrderRequestMenuBuilder;
-import com.ua.yushchenko.tabakabot.model.domain.Order;
 import com.ua.yushchenko.tabakabot.model.domain.User;
-import com.ua.yushchenko.tabakabot.model.enums.OrderStatus;
 import com.ua.yushchenko.tabakabot.model.enums.TobaccoBotCommand;
 import com.ua.yushchenko.tabakabot.model.mapper.UserMapper;
-import com.ua.yushchenko.tabakabot.service.OrderService;
+import com.ua.yushchenko.tabakabot.processor.command.client.ClientCommandFactory;
 import com.ua.yushchenko.tabakabot.service.UserService;
-import lombok.Getter;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramWebhookBot;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
@@ -43,22 +31,21 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
  * @version v.0.1
  */
 @Log4j2
+@Component
 @RequiredArgsConstructor
 public class TobaccoClientBotProcessor extends TelegramWebhookBot {
 
-    private final UserMapper userMapper;
-    private final UserService userService;
-    private final OrderService orderService;
-    private final InformationMessageBuilder informationMessageBuilder;
-    private final TobaccoMenuBuilder tobaccoMenuBuilder;
-    private final TobaccoOrderMenuBuilder tobaccoOrderMenuBuilder;
-    private final TobaccoOrderListMenuBuilder tobaccoOrderListMenuBuilder;
-    private final TobaccoSendOrderRequestMenuBuilder tobaccoSendOrderRequestMenuBuilder;
-    private final TobaccoOrderCoalMenuBuilder tobaccoOrderCoalMenuBuilder;
-    private final TobaccoOrderStatusMenuBuilder tobaccoOrderStatusMenuBuilder;
+    @Value("${telegram.tobacco.clint.bot.token}")
+    private String tobaccoClientBotToken;
 
-    @Getter
-    private final String botToken;
+    @NonNull
+    private final UserMapper userMapper;
+    @NonNull
+    private final UserService userService;
+    @NonNull
+    private final InformationMessageBuilder informationMessageBuilder;
+    @NonNull
+    private final ClientCommandFactory clientCommandFactory;
 
     @Override
     public BotApiMethod<?> onWebhookUpdateReceived(final Update update) {
@@ -68,28 +55,27 @@ public class TobaccoClientBotProcessor extends TelegramWebhookBot {
                 final Long chatId = update.getMessage().getChatId();
 
                 if (isTobaccoBotCommand(message)) {
-                    final String botCommand = getFirstTextOfMessageEntityBotCommand(message);
-                    log.info("onUpdateReceived.E: Start processing {} command", botCommand);
+                    final var botCommand = getFirstCommandOfMessageEntityBotCommand(message);
 
-                    if (Objects.equals(botCommand, START.getCommandString())) {
-                        final User user = userMapper.apiToDomain(message.getFrom());
-                        userService.saveUser(user);
+                    final User user = userMapper.apiToDomain(message.getFrom());
+                    userService.saveUser(user);
 
-                        execute(tobaccoMenuBuilder.buildTobaccoMenu(chatId));
+                    final var sendMessage = clientCommandFactory.retrieveCommand(botCommand)
+                                                                .buildMessage(update, user);
 
-                        log.info("onUpdateReceived.X: Finish processing {} command", botCommand);
-                    } else {
-                        execute(informationMessageBuilder.buildSendMessage(chatId, "Command is not support"));
-                        log.info("onUpdateReceived.X: Command {} is not support", botCommand);
+                    if (Objects.nonNull(sendMessage)) {
+                        log.info("onWebhookUpdateReceived.X: Sending message to client");
+                        execute(sendMessage);
                     }
+
+                    return null;
                 } else {
                     execute(informationMessageBuilder.buildSendMessage(chatId, "It is not command"));
                 }
             } else if (update.hasCallbackQuery()) {
-                log.info("onUpdateReceived.E: Starting processing callback query");
+                log.info("onWebhookUpdateReceived.E: Starting processing callback query");
                 final CallbackQuery callbackQuery = update.getCallbackQuery();
                 final Long chatId = callbackQuery.getMessage().getChatId();
-                final Integer messageId = callbackQuery.getMessage().getMessageId();
                 final Long userId = callbackQuery.getFrom().getId();
                 final String data = callbackQuery.getData();
 
@@ -107,86 +93,15 @@ public class TobaccoClientBotProcessor extends TelegramWebhookBot {
 
                 final TobaccoBotCommand tobaccoBotCommand = getFirstTobaccoBotCommand(data);
 
-                if (Objects.isNull(tobaccoBotCommand)) {
-                    execute(informationMessageBuilder.buildSendMessage(chatId, "Unhandled callback command!!!"));
-                    log.error("@{} tried to use unhandled callback command {}", user.getLinkName(), data);
-                    return null;
+                final var sendMessage = clientCommandFactory.retrieveCommand(tobaccoBotCommand)
+                                                            .buildMessage(update, user);
+
+                if (Objects.nonNull(sendMessage)) {
+                    log.info("onWebhookUpdateReceived.X: Sending message to client");
+                    execute(sendMessage);
                 }
 
-                switch (tobaccoBotCommand) {
-                    case TABAKA_420_LIGHT -> {
-                        execute(tobaccoOrderMenuBuilder.buildTobaccoOrderMenu(chatId, messageId, TOBACCO_420_LIGHT,
-                                                                              tobaccoBotCommand));
-                        log.info("onUpdateReceived.X: Finish processing {} command", tobaccoBotCommand);
-                    }
-                    case TABAKA_420_CLASSIC -> {
-                        execute(tobaccoOrderMenuBuilder.buildTobaccoOrderMenu(chatId, messageId, TOBACCO_420_CLASSIC,
-                                                                              tobaccoBotCommand));
-                        log.info("onUpdateReceived.X: Finish processing {} command", tobaccoBotCommand);
-                    }
-                    case COAL -> {
-                        execute(tobaccoOrderCoalMenuBuilder.buildTobaccoOrderCoalMenu(chatId, messageId));
-                        log.info("onUpdateReceived.X: Finish processing {} command", tobaccoBotCommand);
-                    }
-                    case ORDER_LIST -> {
-                        execute(tobaccoOrderListMenuBuilder.buildTobaccoOrderListMenu(chatId, messageId, user));
-                        log.info("onUpdateReceived.X: Finish processing {} command", tobaccoBotCommand);
-                    }
-                    case ORDER -> {
-                        final String[] splitCommands = data.split(":");
-                        final long itemId = Long.parseLong(splitCommands[2]);
-
-                        orderService.addOrderToUser(userId, itemId);
-
-                        log.info("onUpdateReceived.X: Finish processing {} command", tobaccoBotCommand);
-                    }
-                    case SEND_ORDER_REQUEST -> {
-                        final List<Order> ordersByUserId =
-                                orderService.getOrdersByUserId(user.getUserID())
-                                            .stream()
-                                            .filter(order -> Objects.equals(order.getOrderStatus(), PLANNED))
-                                            .map(order -> order.toBuilder()
-                                                               .orderStatus(OrderStatus.ORDERED)
-                                                               .build())
-                                            .toList();
-
-                        orderService.updateOrders(ordersByUserId);
-
-                        execute(tobaccoSendOrderRequestMenuBuilder.buildSendOrderRequestMenu(chatId, messageId, user));
-                        log.info("onUpdateReceived.X: Finish processing {} command", tobaccoBotCommand);
-                    }
-                    case REMOVE_ORDER -> {
-                        final String[] splitBotCommand = data.split(":");
-                        final Long tobaccoItemId = Long.valueOf(splitBotCommand[1]);
-
-                        orderService.removeOrder(userId, tobaccoItemId);
-
-                        execute(tobaccoOrderListMenuBuilder.buildRemoveTobaccoOrderListMenu(chatId, messageId, user));
-                    }
-                    case ORDER_STATUS -> {
-                        execute(tobaccoOrderStatusMenuBuilder.buildOrderStatusMenu(chatId, messageId, user));
-                        log.info("onUpdateReceived.X: Finish processing {} command", tobaccoBotCommand);
-                    }
-                    case BACK -> {
-                        final String[] splitBotCommand = data.split(":");
-                        final TobaccoBotCommand secondCommand = getEnumByString(splitBotCommand[1]);
-
-                        if (Objects.isNull(secondCommand)) {
-                            log.error("Second bot command is null");
-                            return null;
-                        }
-
-                        switch (secondCommand) {
-                            case START -> execute(tobaccoMenuBuilder.buildBackToTobaccoMenu(chatId, messageId));
-                            case REMOVE_ORDER ->
-                                    execute(tobaccoOrderListMenuBuilder.buildRemoveTobaccoOrderListMenu(chatId,
-                                                                                                        messageId,
-                                                                                                        user));
-                            default -> log.error("Unhandled second command: {}", secondCommand);
-                        }
-                    }
-                    default -> log.error("Unhandled callback command: {}", data);
-                }
+                return null;
             } else {
                 log.error("Unchecked message!!!");
             }
@@ -206,5 +121,10 @@ public class TobaccoClientBotProcessor extends TelegramWebhookBot {
     @Override
     public String getBotUsername() {
         return "Tabaka Bot";
+    }
+
+    @Override
+    public String getBotToken() {
+        return tobaccoClientBotToken;
     }
 }

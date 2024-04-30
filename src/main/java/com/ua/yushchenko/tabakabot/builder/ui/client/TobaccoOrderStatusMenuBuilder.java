@@ -1,19 +1,14 @@
 package com.ua.yushchenko.tabakabot.builder.ui.client;
 
-import static com.ua.yushchenko.tabakabot.model.enums.TobaccoBotCommand.BACK;
-import static com.ua.yushchenko.tabakabot.model.enums.TobaccoBotCommand.START;
-import static com.ua.yushchenko.tabakabot.utility.TobaccoBotCommandUtility.mergeBotCommand;
-
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import com.ua.yushchenko.tabakabot.builder.ui.InlineButtonBuilder;
+import com.ua.yushchenko.tabakabot.builder.ui.CustomButtonBuilder;
 import com.ua.yushchenko.tabakabot.model.domain.Order;
 import com.ua.yushchenko.tabakabot.model.domain.User;
 import com.ua.yushchenko.tabakabot.model.enums.OrderStatus;
 import com.ua.yushchenko.tabakabot.service.OrderService;
-import com.vdurmont.emoji.EmojiParser;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -21,7 +16,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
 /**
  * Represents of builder for {@link EditMessageText} based on Tobacco Order Status
@@ -37,7 +31,7 @@ public class TobaccoOrderStatusMenuBuilder {
     @NonNull
     private OrderService orderService;
     @NonNull
-    private final InlineButtonBuilder buttonBuilder;
+    private final CustomButtonBuilder buttonBuilder;
 
     public EditMessageText buildOrderStatusMenu(final Long chatId, final Integer messageId,
                                                 final User user) {
@@ -54,7 +48,7 @@ public class TobaccoOrderStatusMenuBuilder {
                                                 \t 1) Click to 'back' button
                                                 \t 2) Choose tobacco""")
                                   .replyMarkup(InlineKeyboardMarkup.builder()
-                                                                   .keyboardRow(buildBackToStartButtons())
+                                                                   .keyboardRow(buttonBuilder.buildBackToStartButtons())
                                                                    .build())
                                   .build();
         }
@@ -74,7 +68,7 @@ public class TobaccoOrderStatusMenuBuilder {
                                .text(orderStatusText.toString())
                                .messageId(messageId)
                                .replyMarkup(InlineKeyboardMarkup.builder()
-                                                                .keyboardRow(buildBackToStartButtons())
+                                                                .keyboardRow(buttonBuilder.buildBackToStartButtons())
                                                                 .build())
                                .build();
 
@@ -86,10 +80,5 @@ public class TobaccoOrderStatusMenuBuilder {
         return orderService.getOrdersByUserId(user.getUserID())
                            .stream()
                            .collect(Collectors.groupingBy(Order::getOrderStatus));
-    }
-
-    private List<InlineKeyboardButton> buildBackToStartButtons() {
-        return List.of(buttonBuilder.buildButtonByString(EmojiParser.parseToUnicode(":arrow_left: Back"),
-                                                         mergeBotCommand(BACK, START)));
     }
 }

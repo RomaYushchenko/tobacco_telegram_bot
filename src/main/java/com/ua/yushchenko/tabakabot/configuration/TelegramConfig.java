@@ -5,17 +5,9 @@ import com.ua.yushchenko.tabakabot.builder.ui.admin.LoadTobaccoBuilder;
 import com.ua.yushchenko.tabakabot.builder.ui.admin.MenuBuilder;
 import com.ua.yushchenko.tabakabot.builder.ui.admin.OrderListBuilder;
 import com.ua.yushchenko.tabakabot.builder.ui.admin.ProcessOrderMenuBuilder;
-import com.ua.yushchenko.tabakabot.builder.ui.client.TobaccoMenuBuilder;
-import com.ua.yushchenko.tabakabot.builder.ui.client.TobaccoOrderCoalMenuBuilder;
-import com.ua.yushchenko.tabakabot.builder.ui.client.TobaccoOrderListMenuBuilder;
-import com.ua.yushchenko.tabakabot.builder.ui.client.TobaccoOrderMenuBuilder;
-import com.ua.yushchenko.tabakabot.builder.ui.client.TobaccoOrderStatusMenuBuilder;
-import com.ua.yushchenko.tabakabot.builder.ui.client.TobaccoSendOrderRequestMenuBuilder;
 import com.ua.yushchenko.tabakabot.processor.TobaccoAdminBotProcessor;
 import com.ua.yushchenko.tabakabot.processor.TobaccoClientBotProcessor;
-import com.ua.yushchenko.tabakabot.model.mapper.UserMapper;
 import com.ua.yushchenko.tabakabot.service.OrderService;
-import com.ua.yushchenko.tabakabot.service.UserService;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -39,21 +31,9 @@ import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 public class TelegramConfig {
 
     @NonNull
-    private final UserMapper userMapper;
-    @NonNull
-    private final UserService userService;
-    @NonNull
     private final OrderService orderService;
     @NonNull
     private final InformationMessageBuilder informationMessageBuilder;
-    @NonNull
-    private final TobaccoMenuBuilder tobaccoMenuBuilder;
-    @NonNull
-    private final TobaccoOrderMenuBuilder tobaccoOrderMenuBuilder;
-    @NonNull
-    private final TobaccoOrderListMenuBuilder tobaccoOrderListMenuBuilder;
-    @NonNull
-    private final TobaccoSendOrderRequestMenuBuilder tobaccoSendOrderRequestMenuBuilder;
     @NonNull
     private final MenuBuilder menuBuilder;
     @NonNull
@@ -61,15 +41,10 @@ public class TelegramConfig {
     @NonNull
     private final LoadTobaccoBuilder loadTobaccoBuilder;
     @NonNull
-    private final TobaccoOrderCoalMenuBuilder tobaccoOrderCoalMenuBuilder;
-    @NonNull
-    private final TobaccoOrderStatusMenuBuilder tobaccoOrderStatusMenuBuilder;
-    @NonNull
     private final ProcessOrderMenuBuilder processOrderMenuBuilder;
 
-
-    @Value("${telegram.tobacco.clint.bot.token}")
-    private String tobaccoClientBotToken;
+    @NonNull
+    private TobaccoClientBotProcessor tobaccoClientBotProcessor;
 
     @Value("${telegram.tobacco.admin.bot.token}")
     private String tobaccoAdminBotToken;
@@ -89,7 +64,7 @@ public class TelegramConfig {
 
         try {
             log.info("Register Bot....");
-            TobaccoClientBotProcessor tobaccoClientBotProcessor = tobaccoClientBotProcessor();
+
             tobaccoClientBotProcessor.setWebhook(setWebhookInstance());
 
             TobaccoAdminBotProcessor tobaccoAdminBotProcessor = tobaccoAdminBotController();
@@ -103,21 +78,6 @@ public class TelegramConfig {
             log.error("Unhandled error: ", e);
         }
         return telegramBotsApi;
-    }
-
-    @Bean
-    public TobaccoClientBotProcessor tobaccoClientBotProcessor() {
-        return new TobaccoClientBotProcessor(userMapper,
-                                             userService,
-                                             orderService,
-                                             informationMessageBuilder,
-                                             tobaccoMenuBuilder,
-                                             tobaccoOrderMenuBuilder,
-                                             tobaccoOrderListMenuBuilder,
-                                             tobaccoSendOrderRequestMenuBuilder,
-                                             tobaccoOrderCoalMenuBuilder,
-                                             tobaccoOrderStatusMenuBuilder,
-                                             tobaccoClientBotToken);
     }
 
     @Bean

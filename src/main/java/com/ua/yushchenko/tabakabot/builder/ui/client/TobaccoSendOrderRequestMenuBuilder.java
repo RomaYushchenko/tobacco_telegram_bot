@@ -1,17 +1,14 @@
 package com.ua.yushchenko.tabakabot.builder.ui.client;
 
-import static com.ua.yushchenko.tabakabot.model.enums.TobaccoBotCommand.BACK;
-import static com.ua.yushchenko.tabakabot.model.enums.TobaccoBotCommand.COAL;
-import static com.ua.yushchenko.tabakabot.model.enums.TobaccoBotCommand.START;
-import static com.ua.yushchenko.tabakabot.utility.TobaccoBotCommandUtility.mergeBotCommand;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import com.ua.yushchenko.tabakabot.builder.ui.InlineButtonBuilder;
+import com.ua.yushchenko.tabakabot.builder.ui.CustomButtonBuilder;
 import com.ua.yushchenko.tabakabot.model.domain.Item;
 import com.ua.yushchenko.tabakabot.model.domain.Order;
 import com.ua.yushchenko.tabakabot.model.domain.Tobacco;
@@ -20,7 +17,6 @@ import com.ua.yushchenko.tabakabot.model.enums.ItemType;
 import com.ua.yushchenko.tabakabot.service.ItemService;
 import com.ua.yushchenko.tabakabot.service.OrderService;
 import com.ua.yushchenko.tabakabot.service.TobaccoService;
-import com.vdurmont.emoji.EmojiParser;
 import lombok.Builder;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +26,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
 
 /**
@@ -45,11 +40,11 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKe
 public class TobaccoSendOrderRequestMenuBuilder {
 
     @NonNull
-    private final ItemService tobaccoItemService;
+    private final ItemService itemService;
     @NonNull
     private final OrderService orderService;
     @NonNull
-    private final InlineButtonBuilder buttonBuilder;
+    private final CustomButtonBuilder buttonBuilder;
     @NonNull
     private final TobaccoService tobaccoService;
 
@@ -78,7 +73,7 @@ public class TobaccoSendOrderRequestMenuBuilder {
                                                 \t 1) Click to 'back' button
                                                 \t 2) Choose tobacco""")
                                   .replyMarkup(InlineKeyboardMarkup.builder()
-                                                                   .keyboardRow(buildBackToStartButtons())
+                                                                   .keyboardRow(buttonBuilder.buildBackToStartButtons())
                                                                    .build())
                                   .build();
         }
@@ -92,11 +87,11 @@ public class TobaccoSendOrderRequestMenuBuilder {
                                .chatId(chatId)
                                .messageId(messageId)
                                .text("Hello @" + fullName + "\n" +
-                                       "Your request order sent to admin " +
+                                             "Your request order sent to admin " +
                                              "and it's currently in order processing mode. \n\n" +
                                              "Your order list: \n\n" + orderList)
                                .replyMarkup(InlineKeyboardMarkup.builder()
-                                                                .keyboardRow(buildBackToStartButtons())
+                                                                .keyboardRow(buttonBuilder.buildBackToStartButtons())
                                                                 .build())
                                .build();
 
@@ -120,26 +115,26 @@ public class TobaccoSendOrderRequestMenuBuilder {
         final StringBuilder orderListBuilder = new StringBuilder();
 
         orderRequestContexts.stream()
-                  .collect(Collectors.groupingBy(OrderRequestContext::getTobaccoItemId))
-                  .forEach((tobaccoItemId, orders) -> {
-                      final var tobaccoItem = tobaccoItemService.getItemById(tobaccoItemId);
+                            .collect(Collectors.groupingBy(OrderRequestContext::getTobaccoItemId))
+                            .forEach((tobaccoItemId, orders) -> {
+                                final OrderRequestContext orderRequestContext = orders.get(0);
 
-                      orderListBuilder.append("\t\t\t")
-                                      .append("- ")
-                                      .append(tobaccoItem.getItemType().getItemString())
-                                      .append(" ")
-                                      .append(tobaccoItem.getDescription());
+                                orderListBuilder.append("\t\t\t")
+                                                .append("- ")
+                                                .append(orderRequestContext.getTobaccoType().getItemString())
+                                                .append(" ")
+                                                .append(orderRequestContext.getTaste());
 
-                      final int size = orders.size();
+                                final int size = orders.size();
 
-                      if (size > 1) {
-                          orderListBuilder.append(" (x")
-                                          .append(size)
-                                          .append(")");
-                      }
+                                if (size > 1) {
+                                    orderListBuilder.append(" (x")
+                                                    .append(size)
+                                                    .append(")");
+                                }
 
-                      orderListBuilder.append("\n");
-                  });
+                                orderListBuilder.append("\n");
+                            });
 
         return orderListBuilder.toString();
     }
@@ -147,12 +142,12 @@ public class TobaccoSendOrderRequestMenuBuilder {
     private String buildPrice(final List<OrderRequestContext> orderRequestContexts) {
         final Map<Long, List<OrderRequestContext>> tobaccoItemIdToOrder =
                 orderRequestContexts.stream()
-                          .collect(Collectors.groupingBy(OrderRequestContext::getTobaccoItemId));
+                                    .collect(Collectors.groupingBy(OrderRequestContext::getTobaccoItemId));
 
         final Map<Long, List<Item>> tobaccoItemIdToTobaccoItem =
-                tobaccoItemService.getItemsByIds(new ArrayList<>(tobaccoItemIdToOrder.keySet()))
-                                  .stream()
-                                  .collect(Collectors.groupingBy(Item::getItemId));
+                itemService.getItemsByIds(new ArrayList<>(tobaccoItemIdToOrder.keySet()))
+                           .stream()
+                           .collect(Collectors.groupingBy(Item::getItemId));
 
         final Map<ItemType, List<Tobacco>> tobaccoToType =
                 tobaccoService.getAllTobacco()
@@ -195,16 +190,20 @@ public class TobaccoSendOrderRequestMenuBuilder {
         };
     }
 
-    private List<InlineKeyboardButton> buildBackToStartButtons() {
-        return List.of(buttonBuilder.buildButtonByString(EmojiParser.parseToUnicode(":arrow_left: Back"),
-                                                         mergeBotCommand(BACK, START)));
-    }
-
     private List<OrderRequestContext> buildOrderRequestContext(final List<Order> userOrders) {
         final List<OrderRequestContext> orderRequestContexts = new ArrayList<>();
 
+        final Set<Long> tobaccoIds = userOrders.stream()
+                                               .map(Order::getTobaccoItemId)
+                                               .collect(Collectors.toSet());
+
+        final Map<Long, Item> itemToId =
+                itemService.getItemsByIds(tobaccoIds)
+                           .stream()
+                           .collect(Collectors.toMap(Item::getItemId, Function.identity()));
+
         userOrders.forEach((userOrder) -> {
-            final Item tobaccoItem = tobaccoItemService.getItemById(userOrder.getTobaccoItemId());
+            final Item tobaccoItem = itemToId.get(userOrder.getTobaccoItemId());
 
             orderRequestContexts.add(OrderRequestContext.builder()
                                                         .orderId(userOrder.getOrderId())

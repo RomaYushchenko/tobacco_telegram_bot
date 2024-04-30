@@ -1,16 +1,10 @@
 package com.ua.yushchenko.tabakabot.builder.ui.client;
 
-import static com.ua.yushchenko.tabakabot.model.enums.TobaccoBotCommand.COAL;
-import static com.ua.yushchenko.tabakabot.model.enums.TobaccoBotCommand.ORDER_LIST;
-import static com.ua.yushchenko.tabakabot.model.enums.TobaccoBotCommand.ORDER_STATUS;
-import static com.ua.yushchenko.tabakabot.model.enums.TobaccoBotCommand.SEND_ORDER_REQUEST;
-
-import java.util.ArrayList;
 import java.util.List;
 
-import com.ua.yushchenko.tabakabot.builder.ui.InlineButtonBuilder;
+import com.ua.yushchenko.tabakabot.builder.ui.CustomButtonBuilder;
+import com.ua.yushchenko.tabakabot.model.domain.Tobacco;
 import com.ua.yushchenko.tabakabot.service.TobaccoService;
-import com.vdurmont.emoji.EmojiParser;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -18,7 +12,6 @@ import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
 /**
  * Represents of builder for {@link SendMessage} based on Tobacco
@@ -32,9 +25,9 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKe
 public class TobaccoMenuBuilder {
 
     @NonNull
-    private final TobaccoService tobaccoService;
+    private final CustomButtonBuilder customButtonBuilder;
     @NonNull
-    private final InlineButtonBuilder buttonBuilder;
+    private final TobaccoService tobaccoService;
 
     /**
      * Build {@link SendMessage} for Tobacco menu
@@ -45,8 +38,10 @@ public class TobaccoMenuBuilder {
     public SendMessage buildTobaccoMenu(final Long chatId) {
         log.info("buildTobaccoMenu.E: Building Tobacco menu...");
 
+        final List<Tobacco> tobaccos = tobaccoService.getAllTobacco();
+
         final var replyMarkup = InlineKeyboardMarkup.builder()
-                                                    .keyboard(buildKeyBoardToTobaccoMenu())
+                                                    .keyboard(customButtonBuilder.buildKeyBoardToTobaccoMenu(tobaccos))
                                                     .build();
 
         final SendMessage sendMessage = SendMessage.builder()
@@ -69,8 +64,9 @@ public class TobaccoMenuBuilder {
     public EditMessageText buildBackToTobaccoMenu(final Long chatId, final Integer messageId) {
         log.info("buildBackToTobaccoMenu.E: Building back to Tobacco menu...");
 
+        final List<Tobacco> tobaccos = tobaccoService.getAllTobacco();
         final var replyMarkup = InlineKeyboardMarkup.builder()
-                                                    .keyboard(buildKeyBoardToTobaccoMenu())
+                                                    .keyboard(customButtonBuilder.buildKeyBoardToTobaccoMenu(tobaccos))
                                                     .build();
 
         final EditMessageText sendMessage = EditMessageText.builder()
@@ -82,43 +78,5 @@ public class TobaccoMenuBuilder {
 
         log.info("buildBackToTobaccoMenu.X: Send message is created");
         return sendMessage;
-    }
-
-    private List<List<InlineKeyboardButton>> buildKeyBoardToTobaccoMenu() {
-        final List<List<InlineKeyboardButton>> mainMenuButtons = new ArrayList<>();
-
-        mainMenuButtons.add(buildTobaccoButtons());
-        mainMenuButtons.add(buildCoalItemButtons());
-        mainMenuButtons.add(buildOrderListButtons());
-        mainMenuButtons.add(buildSendOrderRequestButtons());
-        mainMenuButtons.add(buildOrderStatusButtons());
-
-        return mainMenuButtons;
-    }
-
-    private List<InlineKeyboardButton> buildTobaccoButtons() {
-        return tobaccoService.getAllTobacco()
-                             .stream()
-                             .map(tobacco -> buttonBuilder.buildButton(tobacco.getTobaccoName().getItemString(),
-                                                                       tobacco.getTobaccoCommand()))
-                             .toList();
-    }
-
-    private List<InlineKeyboardButton> buildCoalItemButtons() {
-        return List.of(buttonBuilder.buildButton(EmojiParser.parseToUnicode("\uD83E\uDEA8 Coal"), COAL));
-    }
-
-    private List<InlineKeyboardButton> buildOrderListButtons() {
-        return List.of(buttonBuilder.buildButton(EmojiParser.parseToUnicode(":scroll: Order list"), ORDER_LIST));
-    }
-
-    private List<InlineKeyboardButton> buildSendOrderRequestButtons() {
-        return List.of(buttonBuilder.buildButton(EmojiParser.parseToUnicode(":incoming_envelope: Send Order"),
-                                                 SEND_ORDER_REQUEST));
-    }
-
-    private List<InlineKeyboardButton> buildOrderStatusButtons() {
-        return List.of(buttonBuilder.buildButton(EmojiParser.parseToUnicode(":hourglass_flowing_sand: Order Status"),
-                                                 ORDER_STATUS));
     }
 }
