@@ -1,9 +1,5 @@
 package com.ua.yushchenko.tabakabot.builder.ui.admin;
 
-import static com.ua.yushchenko.tabakabot.model.enums.TobaccoBotCommand.BACK;
-import static com.ua.yushchenko.tabakabot.model.enums.TobaccoBotCommand.START;
-import static com.ua.yushchenko.tabakabot.utility.TobaccoBotCommandUtility.mergeBotCommand;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -12,7 +8,7 @@ import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-import com.ua.yushchenko.tabakabot.builder.ui.InlineButtonBuilder;
+import com.ua.yushchenko.tabakabot.builder.ui.CustomButtonBuilder;
 import com.ua.yushchenko.tabakabot.model.domain.Item;
 import com.ua.yushchenko.tabakabot.model.domain.Order;
 import com.ua.yushchenko.tabakabot.model.domain.Tobacco;
@@ -23,7 +19,6 @@ import com.ua.yushchenko.tabakabot.service.ItemService;
 import com.ua.yushchenko.tabakabot.service.OrderService;
 import com.ua.yushchenko.tabakabot.service.TobaccoService;
 import com.ua.yushchenko.tabakabot.service.UserService;
-import com.vdurmont.emoji.EmojiParser;
 import lombok.Builder;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -33,7 +28,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
 @Log4j2
 @Component
@@ -49,7 +43,7 @@ public class OrderListBuilder {
     @NonNull
     private final ItemService itemService;
     @NonNull
-    private final InlineButtonBuilder buttonBuilder;
+    private final CustomButtonBuilder buttonBuilder;
 
     public EditMessageText buildTobaccoAdminOrderListByUserMenu(final Long chatId, final Integer messageId) {
         final List<Order> allOrders = orderService.getAllOrders();
@@ -64,7 +58,7 @@ public class OrderListBuilder {
                                .messageId(messageId)
                                .text("All orders by User: \n\n" + orderList)
                                .replyMarkup(InlineKeyboardMarkup.builder()
-                                                                .keyboardRow(buildBackToStartButtons())
+                                                                .keyboardRow(buttonBuilder.buildBackToStartButtons())
                                                                 .build())
                                .build();
 
@@ -85,7 +79,7 @@ public class OrderListBuilder {
                                .messageId(messageId)
                                .text("All orders: \n\n" + orderList)
                                .replyMarkup(InlineKeyboardMarkup.builder()
-                                                                .keyboardRow(buildBackToStartButtons())
+                                                                .keyboardRow(buttonBuilder.buildBackToStartButtons())
                                                                 .build())
                                .build();
 
@@ -265,11 +259,6 @@ public class OrderListBuilder {
                  });
 
         return userOrderContexts;
-    }
-
-    private List<InlineKeyboardButton> buildBackToStartButtons() {
-        return List.of(buttonBuilder.buildButtonByString(EmojiParser.parseToUnicode(":arrow_left: Back"),
-                                                         mergeBotCommand(BACK, START)));
     }
 
     @Value

@@ -1,11 +1,9 @@
-package com.ua.yushchenko.tabakabot.processor.command.client;
+package com.ua.yushchenko.tabakabot.processor.command.admin;
 
-import com.ua.yushchenko.tabakabot.builder.ui.client.TobaccoMenuBuilder;
+import com.ua.yushchenko.tabakabot.builder.ui.admin.LoadTobaccoBuilder;
 import com.ua.yushchenko.tabakabot.model.domain.User;
 import com.ua.yushchenko.tabakabot.model.enums.TobaccoBotCommand;
-import com.ua.yushchenko.tabakabot.model.mapper.UserMapper;
 import com.ua.yushchenko.tabakabot.processor.command.TobaccoCommand;
-import com.ua.yushchenko.tabakabot.service.UserService;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,33 +13,28 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
 @Slf4j
-@Component("startCommandOfClient")
+@Component
 @RequiredArgsConstructor
-public class StartCommand implements TobaccoCommand {
+public class Load420LightCommand implements TobaccoCommand {
 
     @NonNull
-    private final UserService userService;
-    @NonNull
-    private final UserMapper userMapper;
-    @NonNull
-    private final TobaccoMenuBuilder tobaccoMenuBuilder;
+    private final LoadTobaccoBuilder loadTobaccoBuilder;
 
     @Override
     public BotApiMethod<?> buildMessage(final Update update, final User user) {
-        log.info("execute.E: Processing {} command", getCommand());
+        log.info("execute.E: [ADMIN] Processing {} command", getCommand());
+
         final Message message = update.getMessage();
         final Long chatId = update.getMessage().getChatId();
 
-        //final User user = userMapper.apiToDomain(message.getFrom());
-        userService.saveUser(user);
+        final var sendMessage = loadTobaccoBuilder.buildLoad420LightTobacco(chatId, message);
 
-        final var sendMessage = tobaccoMenuBuilder.buildTobaccoMenu(chatId);
-        log.info("execute.X: Processed {} command", getCommand());
+        log.info("execute.X: [ADMIN] Processed {} command", getCommand());
         return sendMessage;
     }
 
     @Override
     public TobaccoBotCommand getCommand() {
-        return TobaccoBotCommand.START;
+        return TobaccoBotCommand.LOAD_420_LIGHT;
     }
 }

@@ -20,7 +20,7 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
 @Log4j2
-@Component
+@Component("backCommandOfClient")
 @RequiredArgsConstructor
 public class BackCommand implements TobaccoCommand {
 
