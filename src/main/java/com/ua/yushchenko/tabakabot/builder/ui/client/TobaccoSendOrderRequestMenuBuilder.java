@@ -165,7 +165,7 @@ public class TobaccoSendOrderRequestMenuBuilder {
             int costTobacco = 0;
 
             if (Objects.equals(tobaccoType, ItemType.COAL)) {
-                costTobacco = 221;
+                costTobacco = 240;
             } else {
                 final Tobacco tobacco = tobaccoToType.get(tobaccoType).get(0);
                 costTobacco = getCostByWeight(tobacco, tobaccoItem.getWeight());
