@@ -212,30 +212,37 @@ public class OrderListBuilder {
     private String buildOrderList(final List<Order> userOrders) {
         final StringBuilder orderListBuilder = new StringBuilder();
 
+        final Map<Long, List<Order>> ordersTobaccoItemId =
+                userOrders.stream()
+                          .collect(Collectors.groupingBy(Order::getTobaccoItemId));
+
+        final Map<Long, List<Item>> tobaccoItemToId =
+                itemService.getItemsByIds(ordersTobaccoItemId.keySet())
+                           .stream()
+                           .collect(Collectors.groupingBy(Item::getItemId));
+
         AtomicInteger countOrder = new AtomicInteger(0);
 
-        userOrders.stream()
-                  .collect(Collectors.groupingBy(Order::getTobaccoItemId))
-                  .forEach((tobaccoItemId, orders) -> {
-                      final var tobaccoItem = itemService.getItemById(tobaccoItemId);
+        ordersTobaccoItemId.forEach((tobaccoItemId, orders) -> {
+            final var tobaccoItem = tobaccoItemToId.get(tobaccoItemId).get(0);
 
-                      orderListBuilder.append("\t\t\t")
-                                      .append(countOrder.incrementAndGet())
-                                      .append(") ")
-                                      .append(tobaccoItem.getItemType().getItemString())
-                                      .append(" ")
-                                      .append(tobaccoItem.getDescription());
+            orderListBuilder.append("\t\t\t")
+                            .append(countOrder.incrementAndGet())
+                            .append(") ")
+                            .append(tobaccoItem.getItemType().getItemString())
+                            .append(" ")
+                            .append(tobaccoItem.getDescription());
 
-                      final int size = orders.size();
+            final int size = orders.size();
 
-                      if (size > 1) {
-                          orderListBuilder.append(" (x")
-                                          .append(size)
-                                          .append(")");
-                      }
+            if (size > 1) {
+                orderListBuilder.append(" (x")
+                                .append(size)
+                                .append(")");
+            }
 
-                      orderListBuilder.append("\n");
-                  });
+            orderListBuilder.append("\n");
+        });
 
         return orderListBuilder.toString();
     }
