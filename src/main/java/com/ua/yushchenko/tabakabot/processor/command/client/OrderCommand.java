@@ -1,6 +1,6 @@
 package com.ua.yushchenko.tabakabot.processor.command.client;
 
-import com.ua.yushchenko.tabakabot.model.domain.User;
+import com.ua.yushchenko.tabakabot.model.domain.UserRequestModel;
 import com.ua.yushchenko.tabakabot.model.enums.TobaccoBotCommand;
 import com.ua.yushchenko.tabakabot.processor.command.TobaccoCommand;
 import com.ua.yushchenko.tabakabot.service.OrderService;
@@ -9,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
-import org.telegram.telegrambots.meta.api.objects.Update;
 
 @Slf4j
 @Component
@@ -20,14 +19,12 @@ public class OrderCommand implements TobaccoCommand {
     private final OrderService orderService;
 
     @Override
-    public BotApiMethod<?> buildMessage(final Update update, final User user) {
+    public BotApiMethod<?> buildMessage(final UserRequestModel model) {
         log.info("execute.E: Processing {} command", getCommand());
-        final String data = update.getCallbackQuery().getData();
 
-        final String[] splitCommands = data.split(":");
-        final long itemId = Long.parseLong(splitCommands[2]);
+        final long itemId = (Long) model.getTobaccoBotCommands().get(2);
 
-        orderService.addOrderToUser(user.getUserID(), itemId);
+        orderService.addOrderToUser(model.getUser().getUserID(), itemId);
 
         log.info("execute.X: Processed {} command", getCommand());
         return null;

@@ -1,13 +1,13 @@
 package com.ua.yushchenko.tabakabot.processor.command.client;
 
 import static com.ua.yushchenko.tabakabot.model.enums.TobaccoBotCommand.BACK;
-import static com.ua.yushchenko.tabakabot.model.enums.TobaccoBotCommand.getEnumByString;
 
+import java.util.List;
 import java.util.Objects;
 
 import com.ua.yushchenko.tabakabot.builder.ui.client.TobaccoMenuBuilder;
 import com.ua.yushchenko.tabakabot.builder.ui.client.TobaccoOrderListMenuBuilder;
-import com.ua.yushchenko.tabakabot.model.domain.User;
+import com.ua.yushchenko.tabakabot.model.domain.UserRequestModel;
 import com.ua.yushchenko.tabakabot.model.enums.TobaccoBotCommand;
 import com.ua.yushchenko.tabakabot.processor.command.TobaccoCommand;
 import lombok.NonNull;
@@ -15,9 +15,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
-import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
-import org.telegram.telegrambots.meta.api.objects.Message;
-import org.telegram.telegrambots.meta.api.objects.Update;
 
 @Log4j2
 @Component("backCommandOfClient")
@@ -30,17 +27,14 @@ public class BackCommand implements TobaccoCommand {
     private final TobaccoOrderListMenuBuilder orderListMenuBuilder;
 
     @Override
-    public BotApiMethod<?> buildMessage(final Update update, final User user) {
+    public BotApiMethod<?> buildMessage(final UserRequestModel model) {
         log.debug("execute.E: Processing {} command", getCommand());
 
-        final CallbackQuery callbackQuery = update.getCallbackQuery();
-        final Message message = callbackQuery.getMessage();
-        final String data = callbackQuery.getData();
-        final Long chatId = message.getChatId();
-        final Integer messageId = message.getMessageId();
+        final List<Object> data = model.getTobaccoBotCommands();
+        final Long chatId = model.getChatId();
+        final Integer messageId = model.getMessageId();
 
-        final String[] splitBotCommand = data.split(":");
-        final TobaccoBotCommand secondCommand = getEnumByString(splitBotCommand[1]);
+        final TobaccoBotCommand secondCommand = (TobaccoBotCommand) data.get(1);
 
         if (Objects.isNull(secondCommand)) {
             log.error("Second bot command is null");
@@ -56,7 +50,8 @@ public class BackCommand implements TobaccoCommand {
                 return sendMessage;
             }
             case REMOVE_ORDER -> {
-                final var sendMessage = orderListMenuBuilder.buildTobaccoOrderListMenu(chatId, messageId, user);
+                final var sendMessage =
+                        orderListMenuBuilder.buildTobaccoOrderListMenu(chatId, messageId, model.getUser());
                 log.info("execute.X: Processed second {} command", secondCommand);
                 return sendMessage;
             }

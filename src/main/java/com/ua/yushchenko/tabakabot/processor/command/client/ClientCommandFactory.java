@@ -1,6 +1,7 @@
 package com.ua.yushchenko.tabakabot.processor.command.client;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.ua.yushchenko.tabakabot.model.enums.TobaccoBotCommand;
@@ -9,6 +10,7 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 @Slf4j
 @Component
@@ -42,10 +44,18 @@ public class ClientCommandFactory {
         commandMap.put(TobaccoBotCommand.BACK, backCommand);
     }
 
-    public TobaccoCommand retrieveCommand(final TobaccoBotCommand tobaccoBotCommand) {
-        log.info("retrieveCommand.E: finding {} command", tobaccoBotCommand);
-        TobaccoCommand tobaccoCommand = commandMap.getOrDefault(tobaccoBotCommand, null);
-        log.info("retrieveCommand.X: found {} command of instance", tobaccoCommand);
+    public TobaccoCommand retrieveCommand(final List<Object> tobaccoBotCommands) {
+        log.info("retrieveCommand.E: [CLIENT] finding {} command", tobaccoBotCommands);
+
+        if (CollectionUtils.isEmpty(tobaccoBotCommands)) {
+            log.error("retrieveCommand.X: [CLIENT] Unhandled callback command!!!");
+            return null;
+        }
+
+        final TobaccoCommand tobaccoCommand =
+                commandMap.getOrDefault((TobaccoBotCommand) tobaccoBotCommands.get(0), null);
+
+        log.info("retrieveCommand.X: [CLIENT] found {} command of instance", tobaccoCommand);
         return tobaccoCommand;
     }
 }

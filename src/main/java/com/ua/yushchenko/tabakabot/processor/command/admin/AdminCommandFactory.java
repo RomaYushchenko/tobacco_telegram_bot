@@ -43,7 +43,9 @@ public class AdminCommandFactory {
             return null;
         }
 
-        TobaccoCommand tobaccoCommand = commandMap.getOrDefault((TobaccoBotCommand) tobaccoBotCommands.get(0), null);
+        final TobaccoCommand tobaccoCommand =
+                commandMap.getOrDefault((TobaccoBotCommand) tobaccoBotCommands.get(0), null);
+
         log.info("retrieveCommand.X: [ADMIN] found {} command of instance", tobaccoCommand);
         return tobaccoCommand;
     }

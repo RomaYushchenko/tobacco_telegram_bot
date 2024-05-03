@@ -8,6 +8,7 @@ import java.util.Objects;
 import com.ua.yushchenko.tabakabot.builder.ui.client.TobaccoSendOrderRequestMenuBuilder;
 import com.ua.yushchenko.tabakabot.model.domain.Order;
 import com.ua.yushchenko.tabakabot.model.domain.User;
+import com.ua.yushchenko.tabakabot.model.domain.UserRequestModel;
 import com.ua.yushchenko.tabakabot.model.enums.OrderStatus;
 import com.ua.yushchenko.tabakabot.model.enums.TobaccoBotCommand;
 import com.ua.yushchenko.tabakabot.processor.command.TobaccoCommand;
@@ -18,8 +19,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
-import org.telegram.telegrambots.meta.api.objects.Message;
-import org.telegram.telegrambots.meta.api.objects.Update;
 
 @Slf4j
 @Component
@@ -33,11 +32,12 @@ public class SendRequestOrderCommand implements TobaccoCommand {
 
 
     @Override
-    public BotApiMethod<?> buildMessage(final Update update, final User user) {
+    public BotApiMethod<?> buildMessage(final UserRequestModel model) {
         log.info("execute.E: Processing {} command", getCommand());
-        final Message message = update.getCallbackQuery().getMessage();
-        final Long chatId = message.getChatId();
-        final Integer messageId = message.getMessageId();
+
+        final Long chatId = model.getChatId();
+        final Integer messageId = model.getMessageId();
+        final User user = model.getUser();
 
         final List<Order> ordersByUserId =
                 orderService.getOrdersByUserId(user.getUserID())

@@ -9,7 +9,7 @@ import java.util.List;
 
 import com.ua.yushchenko.tabakabot.builder.ui.admin.MenuBuilder;
 import com.ua.yushchenko.tabakabot.builder.ui.admin.ProcessOrderMenuBuilder;
-import com.ua.yushchenko.tabakabot.model.domain.User;
+import com.ua.yushchenko.tabakabot.model.domain.UserRequestModel;
 import com.ua.yushchenko.tabakabot.model.enums.TobaccoBotCommand;
 import com.ua.yushchenko.tabakabot.processor.command.TobaccoCommand;
 import lombok.NonNull;
@@ -17,9 +17,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
-import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
-import org.telegram.telegrambots.meta.api.objects.Message;
-import org.telegram.telegrambots.meta.api.objects.Update;
 
 @Slf4j
 @Component("backCommandOfAdmin")
@@ -32,16 +29,12 @@ public class BackCommand implements TobaccoCommand {
     private final ProcessOrderMenuBuilder processOrderMenuBuilder;
 
     @Override
-    public BotApiMethod<?> buildMessage(final Update update, final User user) {
+    public BotApiMethod<?> buildMessage(final UserRequestModel model) {
         log.info("execute.E: [ADMIN] Processing {} command", getCommand());
 
-        final CallbackQuery callbackQuery = update.getCallbackQuery();
-        final Message message = callbackQuery.getMessage();
-        final Long chatId = message.getChatId();
-        final Integer messageId = message.getMessageId();
-        final String data = callbackQuery.getData();
-
-        final List<Object> tobaccoBotCommands = TobaccoBotCommand.getListCommandsByString(data);
+        final Long chatId = model.getChatId();
+        final Integer messageId = model.getMessageId();
+        final List<Object> tobaccoBotCommands = model.getTobaccoBotCommands();
 
         if (tobaccoBotCommands.size() == 1) {
             log.error("Second bot command is null");

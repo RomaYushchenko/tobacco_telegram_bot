@@ -15,7 +15,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.objects.Message;
 
 @Log4j2
 @Component
@@ -25,8 +24,8 @@ public class LoadTobaccoBuilder {
     @NonNull
     private final ItemService itemService;
 
-    public SendMessage buildLoad420LightTobacco(final Long chatId, final Message message) {
-        final String[] tobaccos = message.getText().split("\n");
+    public SendMessage buildLoad420LightTobacco(final Long chatId, final String messageText) {
+        final String[] tobaccos = messageText.split("\n");
         final List<String> tobaccosList = new ArrayList<>(List.of(tobaccos));
         tobaccosList.remove(0);
 
@@ -60,8 +59,8 @@ public class LoadTobaccoBuilder {
                           .build();
     }
 
-    public SendMessage buildLoad420ClassicTobacco(final Long chatId, final Message message) {
-        final String[] tobaccos = message.getText().split("\n");
+    public SendMessage buildLoad420ClassicTobacco(final Long chatId, final String messageText) {
+        final String[] tobaccos = messageText.split("\n");
         final List<String> tobaccosList = new ArrayList<>(List.of(tobaccos));
         tobaccosList.remove(0);
 
