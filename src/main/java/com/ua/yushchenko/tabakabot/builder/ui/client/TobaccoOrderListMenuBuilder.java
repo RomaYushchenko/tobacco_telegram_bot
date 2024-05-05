@@ -1,15 +1,11 @@
 package com.ua.yushchenko.tabakabot.builder.ui.client;
 
 import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
+import com.ua.yushchenko.tabakabot.builder.OrderListContextBuilder;
 import com.ua.yushchenko.tabakabot.builder.ui.CustomButtonBuilder;
-import com.ua.yushchenko.tabakabot.model.domain.Item;
 import com.ua.yushchenko.tabakabot.model.domain.Order;
 import com.ua.yushchenko.tabakabot.model.domain.User;
-import com.ua.yushchenko.tabakabot.service.ItemService;
 import com.ua.yushchenko.tabakabot.service.OrderService;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -31,11 +27,11 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 public class TobaccoOrderListMenuBuilder {
 
     @NonNull
-    private final ItemService itemService;
-    @NonNull
     private final OrderService orderService;
     @NonNull
     private final CustomButtonBuilder buttonBuilder;
+    @NonNull
+    private final OrderListContextBuilder orderListContextBuilder;
 
     /**
      * Build {@link EditMessageText} for Tobacco Order List menu
@@ -48,7 +44,6 @@ public class TobaccoOrderListMenuBuilder {
         log.info("buildTobaccoOrderListMenu.E: Building Tobacco Order List menu...");
 
         final List<Order> orders = orderService.getPlannedOrdersByUserId(user.getUserID());
-        final String userFullName = user.getLinkName();
 
         if (CollectionUtils.isEmpty(orders)) {
             final var replyMarkup = InlineKeyboardMarkup.builder()
@@ -69,11 +64,14 @@ public class TobaccoOrderListMenuBuilder {
         final var replyMarkup = InlineKeyboardMarkup.builder()
                                                     .keyboard(buttonBuilder.buildKeyBoardToOrderListMenu())
                                                     .build();
+
+        final String tobaccoOrderListInfo = buildTobaccoOrderListInformation(user.getUserID(), orders);
+
         final EditMessageText messageText =
                 EditMessageText.builder()
                                .chatId(chatId)
                                .messageId(messageId)
-                               .text("@" + userFullName + " your order items:\n" + buildTobaccoOrderListInformation(orders))
+                               .text("@" + user.getLinkName() + " your order items:\n" + tobaccoOrderListInfo)
                                .replyMarkup(replyMarkup)
                                .build();
 
@@ -94,7 +92,6 @@ public class TobaccoOrderListMenuBuilder {
         log.info("buildRemoveTobaccoOrderListMenu.E: Building back to Tobacco Order List menu...");
 
         final List<Order> orders = orderService.getPlannedOrdersByUserId(user.getUserID());
-        final String userFullName = user.getLinkName();
 
         final List<Long> tobaccoItemIds = orders.stream()
                                                 .map(Order::getTobaccoItemId)
@@ -102,13 +99,17 @@ public class TobaccoOrderListMenuBuilder {
                                                 .toList();
 
         final var replyMarkup = InlineKeyboardMarkup.builder()
-                                                    .keyboard(buttonBuilder.buildKeyBoardToRemoveOrderMenu(tobaccoItemIds))
+                                                    .keyboard(buttonBuilder.buildKeyBoardToRemoveOrderMenu(
+                                                            tobaccoItemIds))
                                                     .build();
+
+        final String tobaccoOrderListInfo = buildTobaccoOrderListInformation(user.getUserID(), orders);
+
         EditMessageText editMessageText =
                 EditMessageText.builder()
                                .chatId(chatId)
                                .messageId(messageId)
-                               .text("@" + userFullName + " your order items:\n" + buildTobaccoOrderListInformation(orders))
+                               .text("@" + user.getLinkName() + " your order items:\n" + tobaccoOrderListInfo)
                                .replyMarkup(replyMarkup)
                                .build();
 
@@ -116,39 +117,26 @@ public class TobaccoOrderListMenuBuilder {
         return editMessageText;
     }
 
-    private String buildTobaccoOrderListInformation(final List<Order> userOrders) {
+    private String buildTobaccoOrderListInformation(final Long userId, final List<Order> userOrders) {
         final StringBuilder tobaccoOrderListInfo = new StringBuilder();
 
-        final Map<Long, List<Order>> ordersToTobaccoId =
-                userOrders.stream()
-                          .collect(Collectors.groupingBy(Order::getTobaccoItemId));
+        orderListContextBuilder.buildOrderListContexts(userId, userOrders)
+                               .forEach(orderListContext -> {
+                                   tobaccoOrderListInfo.append("\t\t\t")
+                                                       .append(orderListContext.getTobaccoItemId())
+                                                       .append(") ")
+                                                       .append(orderListContext.getItemType().getItemString())
+                                                       .append(" ")
+                                                       .append(orderListContext.getDescription());
 
-        final Map<Long, Item> itemToId =
-                itemService.getItemsByIds(ordersToTobaccoId.keySet())
-                           .stream()
-                           .collect(Collectors.toMap(Item::getItemId, Function.identity()));
+                                   if (orderListContext.getCount() > 1) {
+                                       tobaccoOrderListInfo.append(" (x")
+                                                           .append(orderListContext.getCount())
+                                                           .append(")");
+                                   }
 
-
-        ordersToTobaccoId
-                .forEach((tobaccoItemId, orders) -> {
-                    final var tobaccoItem = itemToId.get(tobaccoItemId);
-
-                    tobaccoOrderListInfo.append(tobaccoItemId)
-                                        .append(") ")
-                                        .append(tobaccoItem.getItemType().getItemString())
-                                        .append(" ")
-                                        .append(tobaccoItem.getDescription());
-
-                    final int size = orders.size();
-
-                    if (size > 1) {
-                        tobaccoOrderListInfo.append(" (x")
-                                            .append(size)
-                                            .append(")");
-                    }
-
-                    tobaccoOrderListInfo.append("\n");
-                });
+                                   tobaccoOrderListInfo.append("\n");
+                               });
 
         return tobaccoOrderListInfo.toString();
     }

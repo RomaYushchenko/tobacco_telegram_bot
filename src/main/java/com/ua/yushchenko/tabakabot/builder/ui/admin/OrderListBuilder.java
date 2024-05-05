@@ -1,28 +1,18 @@
 package com.ua.yushchenko.tabakabot.builder.ui.admin;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
+import com.ua.yushchenko.tabakabot.builder.OrderListContextBuilder;
 import com.ua.yushchenko.tabakabot.builder.ui.CustomButtonBuilder;
-import com.ua.yushchenko.tabakabot.model.domain.Item;
 import com.ua.yushchenko.tabakabot.model.domain.Order;
-import com.ua.yushchenko.tabakabot.model.domain.Tobacco;
-import com.ua.yushchenko.tabakabot.model.domain.User;
-import com.ua.yushchenko.tabakabot.model.enums.ItemType;
+import com.ua.yushchenko.tabakabot.model.domain.OrderListContext;
 import com.ua.yushchenko.tabakabot.model.enums.OrderStatus;
-import com.ua.yushchenko.tabakabot.service.ItemService;
 import com.ua.yushchenko.tabakabot.service.OrderService;
-import com.ua.yushchenko.tabakabot.service.TobaccoService;
-import com.ua.yushchenko.tabakabot.service.UserService;
-import lombok.Builder;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import lombok.Value;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -37,20 +27,23 @@ public class OrderListBuilder {
     @NonNull
     private final OrderService orderService;
     @NonNull
-    private final UserService userService;
-    @NonNull
-    private final TobaccoService tobaccoService;
-    @NonNull
-    private final ItemService itemService;
-    @NonNull
     private final CustomButtonBuilder buttonBuilder;
+    @NonNull
+    private final OrderListContextBuilder orderListContextBuilder;
 
     public EditMessageText buildTobaccoAdminOrderListByUserMenu(final Long chatId, final Integer messageId) {
-        final List<Order> allOrders = orderService.getAllOrders();
+        final List<Order> allOrders = getAllOrderedOrders();
 
-        final List<UserOrderContext> userOrderContexts = buildUserOrderContexts(allOrders);
+        final var ordersToUserId = allOrders.stream()
+                                            .collect(Collectors.groupingBy(Order::getUserId));
 
-        final String orderList = buildOrderListByUser(userOrderContexts);
+        final List<OrderListContext> orderListContexts = new ArrayList<>();
+
+        ordersToUserId.forEach((userId, orders) -> {
+            orderListContexts.addAll(orderListContextBuilder.buildOrderListContexts(userId, orders));
+        });
+
+        final String orderList = buildOrderListByUser(orderListContexts);
 
         final EditMessageText messageText =
                 EditMessageText.builder()
@@ -66,11 +59,18 @@ public class OrderListBuilder {
     }
 
     public EditMessageText buildTobaccoAdminOrderListByAllUserMenu(final Long chatId, final Integer messageId) {
-        final List<Order> allOrders = orderService.getAllOrders();
+        final List<Order> allOrders = getAllOrderedOrders();
 
-        final List<UserOrderContext> userOrderContexts = buildUserOrderContexts(allOrders);
+        final var ordersToUserId = allOrders.stream()
+                                            .collect(Collectors.groupingBy(Order::getUserId));
 
-        final String orderList = buildOrderListByAllOrders(userOrderContexts);
+        final List<OrderListContext> orderListContexts = new ArrayList<>();
+
+        ordersToUserId.forEach((userId, orders) -> {
+            orderListContexts.addAll(orderListContextBuilder.buildOrderListContexts(userId, orders));
+        });
+
+        final String orderList = buildOrderListByAllOrders(orderListContexts);
 
 
         final EditMessageText messageText =
@@ -86,29 +86,16 @@ public class OrderListBuilder {
         return messageText;
     }
 
-    private String buildOrderListByAllOrders(final List<UserOrderContext> userOrderContexts) {
+    private String buildOrderListByAllOrders(final List<OrderListContext> orderListContexts) {
         final StringBuilder orderListBuilder = new StringBuilder();
 
-        final List<Order> allOrders =
-                userOrderContexts.stream()
-                                 .filter(userOrderContext -> !Objects.equals("y_romchik",
-                                                                             userOrderContext.getUser().getLinkName()))
-                                 .map(UserOrderContext::getOrderTobaccos)
-                                 .flatMap(Collection::stream)
-                                 .toList();
-
-        final List<Order> adminOrders =
-                userOrderContexts.stream()
-                                 .filter(userOrderContext -> Objects.equals("y_romchik",
-                                                                            userOrderContext.getUser().getLinkName()))
-                                 .map(UserOrderContext::getOrderTobaccos)
-                                 .flatMap(Collection::stream)
-                                 .toList();
+        final List<OrderListContext> allOrders = getOrderListContextsOfClient(orderListContexts);
+        final List<OrderListContext> adminOrders = getOrderListContextsOfAdmin(orderListContexts);
 
         if (!CollectionUtils.isEmpty(allOrders)) {
             orderListBuilder.append("=====================================")
                             .append("\n")
-                            .append("----- CLIENTs")
+                            .append("\t\t\t\tCLIENTs")
                             .append("\n")
                             .append("\n")
                             .append(buildOrderList(allOrders))
@@ -122,7 +109,7 @@ public class OrderListBuilder {
         if (!CollectionUtils.isEmpty(adminOrders)) {
             orderListBuilder.append("=====================================")
                             .append("\n")
-                            .append("----- ADMINs")
+                            .append("\t\t\t\t ADMINs")
                             .append("\n")
                             .append("\n")
                             .append(buildOrderList(adminOrders))
@@ -136,104 +123,38 @@ public class OrderListBuilder {
         return orderListBuilder.toString();
     }
 
-    private String buildOrderListByUser(final List<UserOrderContext> userOrderContexts) {
+    private String buildOrderListByUser(final List<OrderListContext> orderListContexts) {
         final StringBuilder orderListBuilder = new StringBuilder();
 
-        userOrderContexts.forEach(userOrderContext -> {
-            final User user = userOrderContext.getUser();
-            final List<Order> userOrders = userOrderContext.getOrderTobaccos();
-
-            orderListBuilder.append("@")
-                            .append(user.getLinkName())
-                            .append(": ")
-                            .append("\n")
-                            .append(buildOrderList(userOrders))
-                            .append("-------------------------------------")
-                            .append("\n")
-                            .append(buildPrice(userOrders))
-                            .append("\n")
-                            .append("\n");
-        });
+        orderListContexts.stream()
+                         .collect(Collectors.groupingBy(OrderListContext::getUser))
+                         .forEach((user, userOrders) -> {
+                             orderListBuilder.append("@")
+                                             .append(user.getLinkName())
+                                             .append(": ")
+                                             .append("\n")
+                                             .append(buildOrderList(userOrders))
+                                             .append("-------------------------------------")
+                                             .append("\n")
+                                             .append(buildPrice(userOrders))
+                                             .append("\n")
+                                             .append("\n");
+                         });
 
         return orderListBuilder.toString();
     }
 
-    private String buildPrice(final List<Order> userOrders) {
-        final Map<Long, List<Order>> tobaccoItemIdToOrder =
-                userOrders.stream()
-                          .collect(Collectors.groupingBy(Order::getTobaccoItemId));
-
-        final Map<Long, List<Item>> tobaccoItemIdToTobaccoItem =
-                itemService.getItemsByIds(new ArrayList<>(tobaccoItemIdToOrder.keySet()))
-                           .stream()
-                           .collect(Collectors.groupingBy(Item::getItemId));
-
-        final Map<ItemType, List<Tobacco>> tobaccoToType =
-                tobaccoService.getAllTobacco()
-                              .stream()
-                              .collect(Collectors.groupingBy(Tobacco::getTobaccoName));
-
-        final List<PriceContext> priceContexts = new ArrayList<>();
-
-        tobaccoItemIdToOrder.forEach((tobaccoItemId, orders) -> {
-            final int count = orders.size();
-
-            final Item tobaccoItem = tobaccoItemIdToTobaccoItem.get(tobaccoItemId).get(0);
-            final ItemType tobaccoType = tobaccoItem.getItemType();
-
-            int costTobacco = 0;
-
-            if (Objects.equals(tobaccoType, ItemType.COAL)) {
-                costTobacco = 240;
-            } else {
-                final Tobacco tobacco = tobaccoToType.get(tobaccoType).get(0);
-                costTobacco = getCostByWeight(tobacco, tobaccoItem.getWeight());
-            }
-
-            priceContexts.add(PriceContext.builder()
-                                          .cost(costTobacco * count)
-                                          .build());
-        });
-
-        final Integer cost = priceContexts.stream().mapToInt(PriceContext::getCost).sum();
-
-        return "Cost: " + cost + " grn";
-    }
-
-    private int getCostByWeight(final Tobacco tobacco, final int weight) {
-        return switch (weight) {
-            case 50 -> tobacco.getCost25();
-            case 100 -> tobacco.getCost100();
-            case 250 -> tobacco.getCost250();
-            default -> 0;
-        };
-    }
-
-    private String buildOrderList(final List<Order> userOrders) {
+    private String buildOrderList(final List<OrderListContext> orderListContexts) {
         final StringBuilder orderListBuilder = new StringBuilder();
 
-        final Map<Long, List<Order>> ordersTobaccoItemId =
-                userOrders.stream()
-                          .collect(Collectors.groupingBy(Order::getTobaccoItemId));
-
-        final Map<Long, List<Item>> tobaccoItemToId =
-                itemService.getItemsByIds(ordersTobaccoItemId.keySet())
-                           .stream()
-                           .collect(Collectors.groupingBy(Item::getItemId));
-
-        AtomicInteger countOrder = new AtomicInteger(0);
-
-        ordersTobaccoItemId.forEach((tobaccoItemId, orders) -> {
-            final var tobaccoItem = tobaccoItemToId.get(tobaccoItemId).get(0);
-
+        orderListContexts.forEach(orderListContext -> {
             orderListBuilder.append("\t\t\t")
-                            .append(countOrder.incrementAndGet())
-                            .append(") ")
-                            .append(tobaccoItem.getItemType().getItemString())
+                            .append("- ")
+                            .append(orderListContext.getItemType().getItemString())
                             .append(" ")
-                            .append(tobaccoItem.getDescription());
+                            .append(orderListContext.getDescription());
 
-            final int size = orders.size();
+            final int size = orderListContext.getCount();
 
             if (size > 1) {
                 orderListBuilder.append(" (x")
@@ -247,39 +168,30 @@ public class OrderListBuilder {
         return orderListBuilder.toString();
     }
 
-    private List<UserOrderContext> buildUserOrderContexts(final List<Order> allOrders) {
-        final List<UserOrderContext> userOrderContexts = new ArrayList<>();
+    private String buildPrice(final List<OrderListContext> orderListContexts) {
+        final Integer cost = orderListContexts.stream()
+                                              .mapToInt(OrderListContext::getCost)
+                                              .sum();
 
-        allOrders.stream()
-                 .filter(order -> Objects.equals(order.getOrderStatus(), OrderStatus.ORDERED))
-                 .collect(Collectors.groupingBy(Order::getUserId))
-                 .forEach((userId, orders) -> {
-                     final User user = userService.getUserById(userId);
-
-
-                     final var userOrderContext = UserOrderContext.builder()
-                                                                  .user(user)
-                                                                  .orderTobaccos(orders)
-                                                                  .build();
-
-                     userOrderContexts.add(userOrderContext);
-                 });
-
-        return userOrderContexts;
+        return "Cost: " + cost + " grn";
     }
 
-    @Value
-    @Builder(toBuilder = true)
-    private static class PriceContext {
-
-        int cost;
+    private List<OrderListContext> getOrderListContextsOfClient(final List<OrderListContext> orderListContexts) {
+        return orderListContexts.stream()
+                                .filter(context -> !Objects.equals("y_romchik", context.getUser().getLinkName()))
+                                .toList();
     }
 
-    @Value
-    @Builder(toBuilder = true)
-    private static class UserOrderContext {
+    private List<OrderListContext> getOrderListContextsOfAdmin(final List<OrderListContext> orderListContexts) {
+        return orderListContexts.stream()
+                                .filter(context -> Objects.equals("y_romchik", context.getUser().getLinkName()))
+                                .toList();
+    }
 
-        User user;
-        List<Order> orderTobaccos;
+    private List<Order> getAllOrderedOrders() {
+        return orderService.getAllOrders()
+                           .stream()
+                           .filter(order -> Objects.equals(order.getOrderStatus(), OrderStatus.ORDERED))
+                           .toList();
     }
 }
