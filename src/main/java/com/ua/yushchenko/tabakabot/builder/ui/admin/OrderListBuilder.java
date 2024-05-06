@@ -3,6 +3,7 @@ package com.ua.yushchenko.tabakabot.builder.ui.admin;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import com.ua.yushchenko.tabakabot.builder.OrderListContextBuilder;
@@ -147,23 +148,37 @@ public class OrderListBuilder {
     private String buildOrderList(final List<OrderListContext> orderListContexts) {
         final StringBuilder orderListBuilder = new StringBuilder();
 
-        orderListContexts.forEach(orderListContext -> {
-            orderListBuilder.append("\t\t\t")
-                            .append("- ")
-                            .append(orderListContext.getItemType().getItemString())
-                            .append(" ")
-                            .append(orderListContext.getDescription());
+        final AtomicInteger countOrder = new AtomicInteger(0);
 
-            final int size = orderListContext.getCount();
+        orderListContexts.stream()
+                         .collect(Collectors.groupingBy(OrderListContext::getTobaccoItemId))
+                         .forEach((tobaccoItemId, contexts) -> {
 
-            if (size > 1) {
-                orderListBuilder.append(" (x")
-                                .append(size)
-                                .append(")");
-            }
+                             final var orderListContext = contexts.stream().findAny().orElse(null);
 
-            orderListBuilder.append("\n");
-        });
+                             if (Objects.isNull(orderListContext)) {
+                                 return;
+                             }
+
+                             orderListBuilder.append("\t\t\t")
+                                             .append(countOrder.incrementAndGet())
+                                             .append(") ")
+                                             .append(orderListContext.getItemType().getItemString())
+                                             .append(" ")
+                                             .append(orderListContext.getDescription());
+
+                             final int count = contexts.stream()
+                                                       .mapToInt(OrderListContext::getCount)
+                                                       .sum();
+
+                             if (count > 1) {
+                                 orderListBuilder.append(" (x")
+                                                 .append(count)
+                                                 .append(")");
+                             }
+
+                             orderListBuilder.append("\n");
+                         });
 
         return orderListBuilder.toString();
     }
