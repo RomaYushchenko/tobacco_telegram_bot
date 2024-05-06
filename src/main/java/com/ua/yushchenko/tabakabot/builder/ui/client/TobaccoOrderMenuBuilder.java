@@ -45,7 +45,7 @@ public class TobaccoOrderMenuBuilder {
                                                  final TobaccoBotCommand tobaccoBotCommand) {
         log.info("buildTobaccoOrderMenu.E: Building Tobacco Order menu...");
 
-        final List<Item> items = itemService.getItemsByType(itemType);
+        final List<Item> items = itemService.getAvailableItemsByType(itemType);
         final List<Long> itemIds = items.stream()
                                         .map(Item::getItemId)
                                         .collect(Collectors.toList());

@@ -44,6 +44,7 @@ public class LoadTobaccoBuilder {
                                                       .itemType(TOBACCO_420_LIGHT)
                                                       .description(description)
                                                       .weight(Integer.parseInt(weight))
+                                                      .available(true)
                                                       .build();
                                        })
                                        .toList();
@@ -79,6 +80,7 @@ public class LoadTobaccoBuilder {
                                                       .itemType(TOBACCO_420_CLASSIC)
                                                       .description(description)
                                                       .weight(Integer.parseInt(weight))
+                                                      .available(true)
                                                       .build();
                                        })
                                        .toList();

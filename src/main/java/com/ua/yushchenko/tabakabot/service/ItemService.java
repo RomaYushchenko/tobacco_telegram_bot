@@ -63,6 +63,24 @@ public class ItemService {
     }
 
     /**
+     * Gets list of available {@link Item} by {@link ItemType}
+     *
+     * @param itemType type of item
+     * @return list of {@link Item} by available {@link ItemType}
+     */
+    public List<Item> getAvailableItemsByType(final ItemType itemType) {
+        log.info("getAvailableItemsByType.E: item type: {}", itemType);
+
+        final List<Item> items = itemRepository.findAllByItemTypeAndAvailable(itemType, true)
+                                               .stream()
+                                               .map(itemMapper::dbToDomain)
+                                               .toList();
+
+        log.info("getAvailableItemsByType.X: items: {}", items);
+        return items;
+    }
+
+    /**
      * Gets {@link Item} by ID
      *
      * @param itemId ID of item

@@ -38,6 +38,7 @@ public class TobaccoItemSetUpData {
                                  .itemType(COAL)
                                  .description("Unity (Кокосове вугілля)")
                                  .weight(1000)
+                                 .available(true)
                                  .build());
     }
 

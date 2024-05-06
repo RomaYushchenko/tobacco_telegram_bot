@@ -40,7 +40,7 @@ public class TobaccoOrderCoalMenuBuilder {
     public EditMessageText buildTobaccoOrderCoalMenu(final Long chatId, final Integer messageId) {
         log.info("buildTobaccoOrderCoalMenu.E: Building Tobacco Order Coal menu...");
 
-        final List<Item> coals = itemService.getItemsByType(COAL);
+        final List<Item> coals = itemService.getAvailableItemsByType(COAL);
 
         final var replyMarkup = InlineKeyboardMarkup.builder()
                                                     .keyboard(buttonBuilder.buildKeyBoardToOrderCoalMenu(coals))

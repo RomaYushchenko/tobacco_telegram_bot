@@ -12,4 +12,5 @@ public class Item {
     ItemType itemType;
     String description;
     int weight;
+    boolean available;
 }

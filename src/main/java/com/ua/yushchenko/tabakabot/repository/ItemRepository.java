@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.ua.yushchenko.tabakabot.model.enums.ItemType;
 import com.ua.yushchenko.tabakabot.model.persistence.ItemDb;
+import com.ua.yushchenko.tabakabot.processor.command.client.BackCommand;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
@@ -24,6 +25,14 @@ public interface ItemRepository extends CrudRepository<ItemDb, Long> {
      * @return list of {@link  ItemDb} by {@link  ItemType}
      */
     List<ItemDb> findAllByItemType(final ItemType itemType);
+
+    /**
+     * Find all {@link  ItemDb} by {@link  ItemType} and isAvailable
+     * @param itemType type of item
+     * @param available available
+     * @return list of {@link  ItemDb} by {@link  ItemType} and isAvailable
+     */
+    List<ItemDb> findAllByItemTypeAndAvailable(final ItemType itemType, final Boolean available);
 
     /**
      * Find {@link  ItemDb} by ID of item

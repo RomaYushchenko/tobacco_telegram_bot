@@ -33,4 +33,7 @@ public class ItemDb {
 
     @Column(name = "weight", nullable = false)
     int weight;
+
+    @Column(name = "is_available", nullable = false)
+    boolean available;
 }

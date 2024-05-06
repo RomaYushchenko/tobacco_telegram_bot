@@ -13,6 +13,7 @@ public class ItemMapper {
                    .itemType(itemDb.getItemType())
                    .description(itemDb.getDescription())
                    .weight(itemDb.getWeight())
+                   .available(itemDb.isAvailable())
                    .build();
     }
 
@@ -22,6 +23,7 @@ public class ItemMapper {
                      .itemType(item.getItemType())
                      .description(item.getDescription())
                      .weight(item.getWeight())
+                     .available(item.isAvailable())
                      .build();
     }
 }
