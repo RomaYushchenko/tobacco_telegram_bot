@@ -46,7 +46,6 @@ public class CustomButtonBuilder {
     @NonNull
     private final InlineButtonBuilder buttonBuilder;
 
-
     /**
      * Build list of {@link InlineKeyboardButton} for Tobacco menu
      *

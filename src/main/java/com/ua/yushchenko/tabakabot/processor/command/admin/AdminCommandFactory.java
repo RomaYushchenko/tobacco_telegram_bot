@@ -11,6 +11,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
+/**
+ * Factory to get Admin {@link TobaccoCommand}
+ *
+ * @author romanyushchenko
+ * @version v.0.1
+ */
 @Slf4j
 @Component
 public class AdminCommandFactory {
@@ -35,6 +41,12 @@ public class AdminCommandFactory {
         commandMap.put(TobaccoBotCommand.BACK, backCommand);
     }
 
+    /**
+     * Gets {@link TobaccoCommand} by list of {@link TobaccoBotCommand}
+     *
+     * @param tobaccoBotCommands list of {@link TobaccoBotCommand}
+     * @return {@link TobaccoCommand} by list of {@link TobaccoBotCommand}
+     */
     public TobaccoCommand retrieveCommand(final List<Object> tobaccoBotCommands) {
         log.info("retrieveCommand.E: [ADMIN] finding {} commands", tobaccoBotCommands);
 

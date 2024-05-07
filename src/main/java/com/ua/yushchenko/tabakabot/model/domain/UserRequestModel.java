@@ -6,6 +6,12 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.ToString;
 
+/**
+ * Represents domain user request model entity.
+ *
+ * @author romanyushchenko
+ * @version v.0.1
+ */
 @Data
 @Builder(toBuilder = true)
 public class UserRequestModel {

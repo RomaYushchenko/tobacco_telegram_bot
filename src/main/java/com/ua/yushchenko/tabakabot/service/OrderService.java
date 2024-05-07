@@ -132,25 +132,41 @@ public class OrderService {
 
     }
 
-    public void updateOrders(final List<Order> ordersByUserId) {
-        ordersByUserId.forEach(order -> orderRepository.save(orderMapper.domainToDb(order)));
+    /**
+     * Updates orders
+     *
+     * @param orders list of {@link Order} to update
+     */
+    public void updateOrders(final List<Order> orders) {
+        orders.forEach(order -> orderRepository.save(orderMapper.domainToDb(order)));
     }
 
-    public List<Order> getAllOrders(){
+    /**
+     * Gets all orders
+     *
+     * @return list of {@link Order}
+     */
+    public List<Order> getAllOrders() {
         final List<Order> orders = new ArrayList<>();
 
         orderRepository.findAll()
-                         .forEach(orderDb -> orders.add(orderMapper.dbToDomain(orderDb)));
+                       .forEach(orderDb -> orders.add(orderMapper.dbToDomain(orderDb)));
 
         return orders;
     }
 
+    /**
+     * Get list of {@link Order} by {@link OrderStatus}
+     *
+     * @param orderStatus status of order
+     * @return list of {@link Order} by {@link OrderStatus}
+     */
     public List<Order> getOrderByStatus(final OrderStatus orderStatus) {
         final List<Order> orders = new ArrayList<>();
 
         orderRepository.findAll()
                        .forEach(orderDb -> {
-                           if (Objects.equals(orderDb.getOrderStatus(), orderStatus)){
+                           if (Objects.equals(orderDb.getOrderStatus(), orderStatus)) {
                                orders.add(orderMapper.dbToDomain(orderDb));
                            }
                        });

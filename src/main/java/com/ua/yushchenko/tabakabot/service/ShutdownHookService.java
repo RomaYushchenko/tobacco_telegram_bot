@@ -10,6 +10,12 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+/**
+ * Service that exposes the base functionality for saving data to CSV file on shutdown stage
+ *
+ * @author romanyushchenko
+ * @version v.0.1
+ */
 @Component
 @RequiredArgsConstructor
 public class ShutdownHookService {

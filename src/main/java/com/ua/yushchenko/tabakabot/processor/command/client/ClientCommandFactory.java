@@ -12,6 +12,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
+/**
+ * Factory to get Client {@link TobaccoCommand}
+ *
+ * @author romanyushchenko
+ * @version v.0.1
+ */
 @Slf4j
 @Component
 public class ClientCommandFactory {
@@ -44,6 +50,12 @@ public class ClientCommandFactory {
         commandMap.put(TobaccoBotCommand.BACK, backCommand);
     }
 
+    /**
+     * Gets {@link TobaccoCommand} by list of {@link TobaccoBotCommand}
+     *
+     * @param tobaccoBotCommands list of {@link TobaccoBotCommand}
+     * @return {@link TobaccoCommand} by list of {@link TobaccoBotCommand}
+     */
     public TobaccoCommand retrieveCommand(final List<Object> tobaccoBotCommands) {
         log.info("retrieveCommand.E: [CLIENT] finding {} command", tobaccoBotCommands);
 

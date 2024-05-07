@@ -4,6 +4,12 @@ import com.ua.yushchenko.tabakabot.model.domain.Order;
 import com.ua.yushchenko.tabakabot.model.persistence.OrderDb;
 import org.springframework.stereotype.Component;
 
+/**
+ * Represents mapping persistence to domain entity
+ *
+ * @author romanyushchenko
+ * @version v.0.1
+ */
 @Component
 public class OrderMapper {
 

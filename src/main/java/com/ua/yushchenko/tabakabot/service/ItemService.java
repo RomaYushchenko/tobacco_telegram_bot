@@ -97,6 +97,12 @@ public class ItemService {
         return item;
     }
 
+    /**
+     * Gets list of the {@link Item} by list of ID of items
+     *
+     * @param itemIds list of ID of items
+     * @return list of the {@link Item} by list of ID of items
+     */
     public List<Item> getItemsByIds(final Collection<Long> itemIds) {
         return itemRepository.findAllByItemIdIsIn(itemIds)
                              .stream()
@@ -104,6 +110,11 @@ public class ItemService {
                              .toList();
     }
 
+    /**
+     * Gets all items
+     *
+     * @return list of the {@link Item}
+     */
     public List<Item> getAllItems() {
         final List<Item> items = new ArrayList<>();
         itemRepository.findAll()

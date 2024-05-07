@@ -33,6 +33,14 @@ public class TobaccoOrderStatusMenuBuilder {
     @NonNull
     private final CustomButtonBuilder buttonBuilder;
 
+    /**
+     * Build {@link EditMessageText} for order status menu
+     *
+     * @param chatId    ID of chat
+     * @param messageId ID of message
+     * @param user      instance of user
+     * @return {@link EditMessageText} for order status menu
+     */
     public EditMessageText buildOrderStatusMenu(final Long chatId, final Integer messageId,
                                                 final User user) {
         log.info("buildOrderStatusMenu.E: Building Tobacco Order Status menu...");
@@ -56,11 +64,11 @@ public class TobaccoOrderStatusMenuBuilder {
         final StringBuilder orderStatusText = new StringBuilder();
 
         ordersToOrderStatus.forEach((orderStatus, orders) -> orderStatusText.append("You have ")
-                                                                        .append(orders.size())
-                                                                        .append(" orders in ")
-                                                                        .append(orderStatus.toString())
-                                                                        .append(" status;")
-                                                                        .append("\n"));
+                                                                            .append(orders.size())
+                                                                            .append(" orders in ")
+                                                                            .append(orderStatus.toString())
+                                                                            .append(" status;")
+                                                                            .append("\n"));
 
         final EditMessageText messageText =
                 EditMessageText.builder()

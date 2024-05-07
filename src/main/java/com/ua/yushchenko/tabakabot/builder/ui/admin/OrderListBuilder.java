@@ -20,6 +20,12 @@ import org.springframework.util.CollectionUtils;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 
+/**
+ * Represents of builder for {@link EditMessageText} based on Admin Order List
+ *
+ * @author romanyushchenko
+ * @version v.0.1
+ */
 @Log4j2
 @Component
 @RequiredArgsConstructor
@@ -32,6 +38,13 @@ public class OrderListBuilder {
     @NonNull
     private final OrderListContextBuilder orderListContextBuilder;
 
+    /**
+     * Build {@link EditMessageText} for Order List by user
+     *
+     * @param chatId    ID of chat
+     * @param messageId ID of message
+     * @return {@link EditMessageText} for Order List by user
+     */
     public EditMessageText buildTobaccoAdminOrderListByUserMenu(final Long chatId, final Integer messageId) {
         final List<Order> allOrders = getAllOrderedOrders();
 
@@ -59,6 +72,13 @@ public class OrderListBuilder {
         return messageText;
     }
 
+    /**
+     * Build {@link EditMessageText} for Order List by all user
+     *
+     * @param chatId    ID of chat
+     * @param messageId ID of message
+     * @return {@link EditMessageText} for Order List by all user
+     */
     public EditMessageText buildTobaccoAdminOrderListByAllUserMenu(final Long chatId, final Integer messageId) {
         final List<Order> allOrders = getAllOrderedOrders();
 

@@ -1,7 +1,7 @@
 package com.ua.yushchenko.tabakabot.common.setup;
 
-import static java.nio.charset.StandardCharsets.*;
-import static org.apache.commons.csv.CSVFormat.*;
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.apache.commons.csv.CSVFormat.DEFAULT;
 
 import java.io.BufferedReader;
 import java.io.FileWriter;
@@ -18,8 +18,20 @@ import com.ua.yushchenko.tabakabot.model.enums.ItemType;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 
+/**
+ * Represents of helper for convert CSV file
+ *
+ * @author romanyushchenko
+ * @version v.0.1
+ */
 public class CSVHelper {
 
+    /**
+     * Convert {@link InputStream} to ist of the {@link Item}
+     *
+     * @param inputStream instance of {@link InputStream}
+     * @return list of the {@link Item}
+     */
     public static List<Item> csvToItems(final InputStream inputStream) {
         try (final BufferedReader fileReader = new BufferedReader(new InputStreamReader(inputStream, UTF_8));
              final CSVParser csvParser = new CSVParser(fileReader,
@@ -53,10 +65,16 @@ public class CSVHelper {
         }
     }
 
-    public static void itemsToCsv(final List<Item> items, final String file){
+    /**
+     * Convert list of {@link Item} to CSV file
+     *
+     * @param items list of {@link Item}
+     * @param file  file name
+     */
+    public static void itemsToCsv(final List<Item> items, final String file) {
         try (CSVWriter writer = new CSVWriter(new FileWriter(file))) {
             // Write header
-            String[] header = {"tobaccoType", "taste", "weight"}; // Replace with your actual column names
+            String[] header = {"tobaccoType", "taste", "weight"};
             writer.writeNext(header);
 
             items.forEach(item -> {
@@ -73,7 +91,7 @@ public class CSVHelper {
         }
     }
 
-    public static void orderToCsv(final List<Order> orders, final String file){
+    public static void orderToCsv(final List<Order> orders, final String file) {
         try (CSVWriter writer = new CSVWriter(new FileWriter(file))) {
             // Write header
             String[] header = {"orderId", "userId", "tobaccoItemId", "orderTime", "orderStatus"};

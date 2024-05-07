@@ -8,6 +8,12 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.Setter;
 
+/**
+ * Represents domain user entity.
+ *
+ * @author romanyushchenko
+ * @version v.0.1
+ */
 @Data
 @Builder(toBuilder = true)
 public class User {

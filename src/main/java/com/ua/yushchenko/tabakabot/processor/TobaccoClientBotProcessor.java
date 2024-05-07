@@ -17,7 +17,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 /**
- * Class that provide main Tobacco Bot functionality
+ * Class that represents the processing Telegram Bot requests
  *
  * @author romanyushchenko
  * @version v.0.1

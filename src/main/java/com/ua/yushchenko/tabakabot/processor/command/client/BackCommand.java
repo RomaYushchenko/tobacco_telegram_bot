@@ -16,6 +16,12 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 
+/**
+ * Class that represents the processing of the {@link TobaccoCommand} {@link TobaccoBotCommand#BACK} for Client
+ *
+ * @author romanyushchenko
+ * @version v.0.1
+ */
 @Log4j2
 @Component("backCommandOfClient")
 @RequiredArgsConstructor

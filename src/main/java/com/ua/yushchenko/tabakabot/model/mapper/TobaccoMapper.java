@@ -1,11 +1,15 @@
 package com.ua.yushchenko.tabakabot.model.mapper;
 
 import com.ua.yushchenko.tabakabot.model.domain.Tobacco;
-import com.ua.yushchenko.tabakabot.model.enums.ItemType;
-import com.ua.yushchenko.tabakabot.model.enums.TobaccoBotCommand;
 import com.ua.yushchenko.tabakabot.model.persistence.TobaccoDb;
 import org.springframework.stereotype.Component;
 
+/**
+ * Represents mapping persistence to domain entity
+ *
+ * @author romanyushchenko
+ * @version v.0.1
+ */
 @Component
 public class TobaccoMapper {
 

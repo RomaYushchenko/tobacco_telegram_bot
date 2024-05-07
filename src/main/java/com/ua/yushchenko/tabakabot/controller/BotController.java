@@ -12,6 +12,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
+/**
+ * Represents of controller for handling Telegram Bot requests
+ *
+ * @author romanyushchenko
+ * @version v.0.1
+ */
 @Slf4j
 @RestController
 @RequiredArgsConstructor
@@ -22,6 +28,12 @@ public class BotController {
     @NonNull
     private final TobaccoAdminBotProcessor tobaccoAdminBotProcessor;
 
+    /**
+     * Handle {@link Update} request for Telegram Bot Client
+     *
+     * @param update instance of {@link Update}
+     * @return instance of {@link ResponseEntity}
+     */
     @RequestMapping(value = "/callback/client/update", method = RequestMethod.POST)
     public ResponseEntity<?> onUpdateReceivedClient(@RequestBody Update update) {
         try {
@@ -29,7 +41,7 @@ public class BotController {
 
             return ResponseEntity.ok()
                                  .build();
-        } catch (Exception e) {
+        } catch (final Exception e) {
             log.error("Unhandled error", e);
             return ResponseEntity.badRequest()
                                  .build();
@@ -37,6 +49,12 @@ public class BotController {
 
     }
 
+    /**
+     * Handle {@link Update} request for Telegram Bot Admin
+     *
+     * @param update instance of {@link Update}
+     * @return instance of {@link ResponseEntity}
+     */
     @RequestMapping(value = "/callback/admin/update", method = RequestMethod.POST)
     public ResponseEntity<?> onUpdateReceivedAdmin(@RequestBody Update update) {
         try {
@@ -44,7 +62,7 @@ public class BotController {
 
             return ResponseEntity.ok()
                                  .build();
-        } catch (Exception e) {
+        } catch (final Exception e) {
             log.error("Unhandled error", e);
             return ResponseEntity.badRequest()
                                  .build();

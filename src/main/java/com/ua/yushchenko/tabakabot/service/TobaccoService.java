@@ -3,7 +3,6 @@ package com.ua.yushchenko.tabakabot.service;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.ua.yushchenko.tabakabot.model.domain.Order;
 import com.ua.yushchenko.tabakabot.model.domain.Tobacco;
 import com.ua.yushchenko.tabakabot.model.mapper.TobaccoMapper;
 import com.ua.yushchenko.tabakabot.model.persistence.TobaccoDb;
@@ -29,11 +28,21 @@ public class TobaccoService {
     @NonNull
     private final TobaccoMapper tobaccoMapper;
 
-    public void saveTobacco(final Tobacco tobacco){
+    /**
+     * Save {@link Tobacco}
+     *
+     * @param tobacco instance of {@link Tobacco}
+     */
+    public void saveTobacco(final Tobacco tobacco) {
         final TobaccoDb tobaccoDb = tobaccoMapper.domainToDb(tobacco);
         tobaccoRepository.save(tobaccoDb);
     }
 
+    /**
+     * Gets all tobaccos
+     *
+     * @return list of the {@link  Tobacco}
+     */
     public List<Tobacco> getAllTobacco() {
         final List<Tobacco> tobaccos = new ArrayList<>();
         tobaccoRepository.findAll().forEach(tobaccoDb -> tobaccos.add(tobaccoMapper.dbToDomain(tobaccoDb)));

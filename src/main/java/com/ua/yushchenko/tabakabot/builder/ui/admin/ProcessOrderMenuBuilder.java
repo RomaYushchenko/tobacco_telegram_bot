@@ -17,6 +17,12 @@ import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 
+/**
+ * Represents of builder for {@link EditMessageText} based on Admin Processing Orders menu
+ *
+ * @author romanyushchenko
+ * @version v.0.1
+ */
 @Slf4j
 @Component
 @RequiredArgsConstructor

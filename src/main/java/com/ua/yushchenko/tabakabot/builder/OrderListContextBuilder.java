@@ -21,6 +21,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+/**
+ * Represents of builder for {@link OrderListContext} based on orders
+ *
+ * @author romanyushchenko
+ * @version v.0.1
+ */
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -33,6 +39,13 @@ public class OrderListContextBuilder {
     @NonNull
     private final TobaccoService tobaccoService;
 
+    /**
+     * Builds list of the {@link OrderListContext} by user orders
+     *
+     * @param userId     ID of user
+     * @param userOrders orders of user
+     * @return list of the {@link OrderListContext} by user orders
+     */
     public List<OrderListContext> buildOrderListContexts(final long userId, final List<Order> userOrders) {
         final Map<Long, List<Order>> ordersToTobaccoId =
                 userOrders.stream()

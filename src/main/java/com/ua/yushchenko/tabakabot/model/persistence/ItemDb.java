@@ -12,6 +12,12 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Entity that reproduce Item table
+ *
+ * @author romanyushchenko
+ * @version v.0.1
+ */
 @Table(name = "tb_item")
 @Entity
 @Data

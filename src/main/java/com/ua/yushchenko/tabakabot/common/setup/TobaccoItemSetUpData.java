@@ -42,7 +42,7 @@ public class TobaccoItemSetUpData {
                                  .build());
     }
 
-    public void setUpTobaccos() {
+    private void setUpTobaccos() {
         final Tobacco tobacco420Light = Tobacco.builder()
                                                .tobaccoId(1)
                                                .tobaccoName(TOBACCO_420_LIGHT)

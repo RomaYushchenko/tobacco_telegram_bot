@@ -18,6 +18,12 @@ import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
+/**
+ * Represents of builder for {@link UserRequestModel} based on {@link Update}
+ *
+ * @author romanyushchenko
+ * @version v.0.1
+ */
 @Log4j2
 @Component
 @RequiredArgsConstructor
@@ -26,6 +32,12 @@ public class UserRequestModelBuilder {
     @NonNull
     private final UserMapper userMapper;
 
+    /**
+     * Builds {@link UserRequestModel} by {@link Update}
+     *
+     * @param update instance of {@link Update}
+     * @return {@link UserRequestModel} by {@link Update}
+     */
     public UserRequestModel build(final Update update) {
         final Long chatId = getChatId(update);
         final User user = getUser(update);
