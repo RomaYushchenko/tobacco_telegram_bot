@@ -395,7 +395,8 @@ public class CustomButtonBuilder {
     }
 
     private List<InlineKeyboardButton> buildUserListAdminButtons() {
-        return List.of(buttonBuilder.buildButton(EmojiParser.parseToUnicode(":incoming_envelope: Gat All users"),
+        return List.of(buttonBuilder.buildButton(EmojiParser.parseToUnicode("\uD83D\uDC68\u200D\uD83D\uDC69\u200D" +
+                                                                                    "\uD83D\uDC67\u200D\uD83D\uDC66 Gat All users"),
                                                  GET_ALL_USERS));
     }
 

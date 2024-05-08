@@ -1,5 +1,8 @@
 package com.ua.yushchenko.tabakabot.service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.ua.yushchenko.tabakabot.model.domain.User;
 import com.ua.yushchenko.tabakabot.model.mapper.UserMapper;
 import com.ua.yushchenko.tabakabot.repository.UserRepository;
@@ -56,5 +59,22 @@ public class UserService {
         log.info("getUserById.X: user: {}", user);
         return user;
 
+    }
+
+    /**
+     * Gets all users of system
+     *
+     * @return list of {@link User}
+     */
+    public List<User> getAllUsers() {
+        log.info("getAllUsers.E:");
+
+        final List<User> users = new ArrayList<>();
+
+        userRepository.findAll()
+                      .forEach(userDb -> users.add(userMapper.dbToDomain(userDb)));
+
+        log.info("getAllUsers.X: users: {}", users);
+        return users;
     }
 }

@@ -68,6 +68,11 @@ public class OrderListContextBuilder {
         ordersToTobaccoId.forEach((tobaccoItemId, orders) -> {
             final var tobaccoItem = itemToId.get(tobaccoItemId);
 
+            if (tobaccoItem == null) {
+                log.warn("Cannot find Item [ID:{}]. Skip building Order List Context", tobaccoItemId);
+                return;
+            }
+
             final ItemType itemType = tobaccoItem.getItemType();
             final int weight = tobaccoItem.getWeight();
             final int cost = getCostTobacco(itemType, weight, tobaccoToType) * orders.size();

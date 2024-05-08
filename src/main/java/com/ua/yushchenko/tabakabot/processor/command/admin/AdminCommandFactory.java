@@ -28,6 +28,7 @@ public class AdminCommandFactory {
                                final @NonNull Load420ClassicCommand load420ClassicCommand,
                                final @NonNull GetAllOrdersByUserCommand getAllOrdersByUserCommand,
                                final @NonNull GetAllOrdersCommand getAllOrdersCommand,
+                               final @NonNull GetAllUsersCommand getAllUsersCommand,
                                final @NonNull ProcessingOrderMenuCommand processingOrderMenuCommand,
                                final @NonNull BackCommand backCommand) {
         this.commandMap = new HashMap<>();
@@ -37,6 +38,7 @@ public class AdminCommandFactory {
         commandMap.put(TobaccoBotCommand.LOAD_420_CLASSIC, load420ClassicCommand);
         commandMap.put(TobaccoBotCommand.GET_ALL_ORDERS_BY_USER, getAllOrdersByUserCommand);
         commandMap.put(TobaccoBotCommand.GET_ALL_ORDERS, getAllOrdersCommand);
+        commandMap.put(TobaccoBotCommand.GET_ALL_USERS, getAllUsersCommand);
         commandMap.put(TobaccoBotCommand.PROCESSING_ORDERS_MENU, processingOrderMenuCommand);
         commandMap.put(TobaccoBotCommand.BACK, backCommand);
     }
