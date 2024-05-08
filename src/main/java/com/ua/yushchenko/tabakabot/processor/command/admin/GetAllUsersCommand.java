@@ -16,7 +16,7 @@ import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 
 /**
- * Class that represents the processing of the {@link TobaccoCommand} {@link TobaccoBotCommand#GET_ALL_ORDERS} for Admin
+ * Class that represents the processing of the {@link TobaccoCommand} {@link TobaccoBotCommand#GET_ALL_USERS} for Admin
  *
  * @author romanyushchenko
  * @version v.0.1
