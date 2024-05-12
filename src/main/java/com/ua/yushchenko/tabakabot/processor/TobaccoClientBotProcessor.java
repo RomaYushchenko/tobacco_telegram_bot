@@ -6,6 +6,7 @@ import com.ua.yushchenko.tabakabot.builder.UserRequestModelBuilder;
 import com.ua.yushchenko.tabakabot.model.domain.UserRequestModel;
 import com.ua.yushchenko.tabakabot.processor.command.TobaccoCommand;
 import com.ua.yushchenko.tabakabot.processor.command.client.ClientCommandFactory;
+import com.ua.yushchenko.tabakabot.processor.common.UserProcessor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -34,11 +35,15 @@ public class TobaccoClientBotProcessor extends TelegramWebhookBot {
     private final ClientCommandFactory clientCommandFactory;
     @NonNull
     private final UserRequestModelBuilder userRequestModelBuilder;
+    @NonNull
+    private final UserProcessor userProcessor;
 
     @Override
     public BotApiMethod<?> onWebhookUpdateReceived(final Update update) {
         try {
             final UserRequestModel model = userRequestModelBuilder.build(update);
+
+            userProcessor.preProcessingUser(model);
 
             final TobaccoCommand tobaccoCommand = clientCommandFactory.retrieveCommand(model.getTobaccoBotCommands());
 

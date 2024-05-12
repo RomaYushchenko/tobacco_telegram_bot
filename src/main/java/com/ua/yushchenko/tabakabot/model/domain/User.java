@@ -26,6 +26,7 @@ public class User {
     String fullName;
 
     UserRole userRole;
+    Long chatId;
 
     public String getLinkName() {
         return Objects.nonNull(getUserName())

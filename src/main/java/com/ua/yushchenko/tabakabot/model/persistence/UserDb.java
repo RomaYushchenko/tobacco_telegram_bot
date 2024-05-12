@@ -42,4 +42,7 @@ public class UserDb {
     @Enumerated(EnumType.STRING)
     @Column(name = "user_role")
     UserRole userRole;
+
+    @Column(name = "chat_id")
+    Long chatId;
 }

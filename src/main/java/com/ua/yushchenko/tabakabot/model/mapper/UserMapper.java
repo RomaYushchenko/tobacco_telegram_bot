@@ -13,12 +13,14 @@ import org.springframework.stereotype.Component;
 @Component
 public class UserMapper {
 
-    public User apiToDomain(final org.telegram.telegrambots.meta.api.objects.User userApi) {
+    public User apiToDomain(final org.telegram.telegrambots.meta.api.objects.User userApi,
+                            final Long chatId) {
         return User.builder()
                    .userID(userApi.getId())
                    .userName(userApi.getUserName())
                    .firstName(userApi.getFirstName())
                    .lastName(userApi.getLastName())
+                   .chatId(chatId)
                    .build();
     }
 
@@ -28,6 +30,7 @@ public class UserMapper {
                    .userName(userDb.getUserName())
                    .firstName(userDb.getFirstName())
                    .lastName(userDb.getLastName())
+                   .chatId(userDb.getChatId())
                    .build();
     }
 
@@ -37,6 +40,7 @@ public class UserMapper {
                      .userName(user.getUserName())
                      .firstName(user.getFirstName())
                      .lastName(user.getLastName())
+                     .chatId(user.getChatId())
                      .build();
     }
 }

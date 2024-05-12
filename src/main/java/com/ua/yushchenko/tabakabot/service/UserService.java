@@ -23,9 +23,9 @@ import org.springframework.stereotype.Service;
 public class UserService {
 
     @NonNull
-    public final UserRepository userRepository;
+    private final UserRepository userRepository;
     @NonNull
-    public final UserMapper userMapper;
+    private final UserMapper userMapper;
 
     /**
      * Save user

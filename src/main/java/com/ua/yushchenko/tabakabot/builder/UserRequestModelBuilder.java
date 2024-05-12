@@ -40,7 +40,7 @@ public class UserRequestModelBuilder {
      */
     public UserRequestModel build(final Update update) {
         final Long chatId = getChatId(update);
-        final User user = getUser(update);
+        final User user = getUser(update, chatId);
 
         log.info("build.E: Building request model for [userID:{}] and [chatID:{}]", user.getUserID(), chatId);
 
@@ -72,11 +72,11 @@ public class UserRequestModelBuilder {
         throw new IllegalArgumentException("Cannot find chat ID");
     }
 
-    private User getUser(final Update update) {
+    private User getUser(final Update update, final Long chatId) {
         if (update.hasMessage()) {
-            return userMapper.apiToDomain(update.getMessage().getFrom());
+            return userMapper.apiToDomain(update.getMessage().getFrom(), chatId);
         } else if (update.hasCallbackQuery()) {
-            return userMapper.apiToDomain(update.getCallbackQuery().getFrom());
+            return userMapper.apiToDomain(update.getCallbackQuery().getFrom(), chatId);
         }
 
         throw new IllegalArgumentException("Cannot find User");
