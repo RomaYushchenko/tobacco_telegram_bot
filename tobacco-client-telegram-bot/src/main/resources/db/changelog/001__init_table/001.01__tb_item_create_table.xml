@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+    <changeSet id="001.01" author="yushchenko" runOnChange="true">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="tb_item"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="tb_item">
+            <column name="item_id" type="INTEGER">
+                <constraints primaryKey="true" primaryKeyName="tb_item_pk"/>
+            </column>
+            <column name="item_type" type="VARCHAR(32)"/>
+            <column name="description" type="VARCHAR(225)"/>
+            <column name="weight" type="INTEGER"/>
+        </createTable>
+    </changeSet>
+</databaseChangeLog>

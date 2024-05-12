@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+    <changeSet id="001.02" author="yushchenko" runOnChange="true">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="tb_order"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="tb_order">
+            <column name="order_id" type="INTEGER" autoIncrement="true">
+                <constraints primaryKey="true" primaryKeyName="tb_order_pk"/>
+            </column>
+            <column name="user_id" type="INTEGER"/>
+            <column name="tobacco_item_id" type="INTEGER"/>
+            <column name="order_time" type="TIMESTAMP WITHOUT TIME ZONE"/>
+            <column name="order_status" type="VARCHAR(32)"/>
+        </createTable>
+    </changeSet>
+</databaseChangeLog>
