@@ -11,5 +11,3 @@ tokens/
 ### CSV FILES ###
 items.csv
 orders.csv
-
-ngrok.yml

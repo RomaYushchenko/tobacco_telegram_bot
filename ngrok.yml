@@ -1,9 +1,0 @@
-version: "2"
-authtoken: 2evWSKu67YC79pOtrfLhzu22b8N_5pU6Ec1KAcET9aQobzksJ
-tunnels:
-  first:
-    addr: 8084
-    proto: http
-  second:
-    addr: 8085
-    proto: http
