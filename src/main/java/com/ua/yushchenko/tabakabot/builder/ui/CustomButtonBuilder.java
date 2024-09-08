@@ -7,8 +7,10 @@ import static com.ua.yushchenko.tabakabot.model.enums.TobaccoBotCommand.COMPLETE
 import static com.ua.yushchenko.tabakabot.model.enums.TobaccoBotCommand.GET_ALL_ORDERS;
 import static com.ua.yushchenko.tabakabot.model.enums.TobaccoBotCommand.GET_ALL_ORDERS_BY_USER;
 import static com.ua.yushchenko.tabakabot.model.enums.TobaccoBotCommand.GET_ALL_USERS;
+import static com.ua.yushchenko.tabakabot.model.enums.TobaccoBotCommand.GLOBAL_ORDERED_STATISTICS_MENU;
 import static com.ua.yushchenko.tabakabot.model.enums.TobaccoBotCommand.ORDER;
 import static com.ua.yushchenko.tabakabot.model.enums.TobaccoBotCommand.ORDERED_MENU;
+import static com.ua.yushchenko.tabakabot.model.enums.TobaccoBotCommand.ORDERED_STATISTICS_MENU;
 import static com.ua.yushchenko.tabakabot.model.enums.TobaccoBotCommand.ORDER_LIST;
 import static com.ua.yushchenko.tabakabot.model.enums.TobaccoBotCommand.ORDER_STATUS;
 import static com.ua.yushchenko.tabakabot.model.enums.TobaccoBotCommand.PLANNED_MENU;
@@ -17,6 +19,7 @@ import static com.ua.yushchenko.tabakabot.model.enums.TobaccoBotCommand.REJECT_M
 import static com.ua.yushchenko.tabakabot.model.enums.TobaccoBotCommand.REMOVE_ORDER;
 import static com.ua.yushchenko.tabakabot.model.enums.TobaccoBotCommand.SEND_ORDER_REQUEST;
 import static com.ua.yushchenko.tabakabot.model.enums.TobaccoBotCommand.START;
+import static com.ua.yushchenko.tabakabot.model.enums.TobaccoBotCommand.USER_ORDERED_STATISTICS_MENU;
 import static com.ua.yushchenko.tabakabot.utility.TobaccoBotCommandUtility.mergeBotCommand;
 
 import java.util.ArrayList;
@@ -60,6 +63,7 @@ public class CustomButtonBuilder {
         mainMenuButtons.add(buildOrderListButtons());
         mainMenuButtons.add(buildSendOrderRequestButtons());
         mainMenuButtons.add(buildOrderStatusButtons());
+        mainMenuButtons.add(buildOrderStatisticsButtons());
 
         return mainMenuButtons;
     }
@@ -222,6 +226,33 @@ public class CustomButtonBuilder {
                                                          mergeBotCommand(BACK, START)));
     }
 
+    /**
+     * Build list of {@link InlineKeyboardButton} for Order List menu
+     *
+     * @return list of {@link InlineKeyboardButton} for Order List menu
+     */
+    public List<List<InlineKeyboardButton>> buildKeyBoardToOrderedStatisticsMenu() {
+        final List<List<InlineKeyboardButton>> orderListMenuButtons = new ArrayList<>();
+        orderListMenuButtons.add(buildGlobalStatisticsButtons());
+        orderListMenuButtons.add(buildUserStatisticsButtons());
+        orderListMenuButtons.add(buildBackToStartButtons());
+
+        return orderListMenuButtons;
+    }
+
+    /**
+     * Build list of {@link InlineKeyboardButton} for Admin Planned menu
+     *
+     * @return list of {@link InlineKeyboardButton} for Admin Planned menu
+     */
+    public List<List<InlineKeyboardButton>> buildKeyBoardToGlobalOrderedStatisticsMenu() {
+        final List<List<InlineKeyboardButton>> plannedMenuButtons = new ArrayList<>();
+
+        plannedMenuButtons.add(buildBackToOrderedStatisticsMenuButtons());
+
+        return plannedMenuButtons;
+    }
+
     private List<InlineKeyboardButton> buildTobaccoButtons(final List<Tobacco> tobaccos) {
         return tobaccos.stream()
                        .map(tobacco -> buttonBuilder.buildButton(tobacco.getTobaccoName().getItemString(),
@@ -377,6 +408,11 @@ public class CustomButtonBuilder {
                                                  ORDER_STATUS));
     }
 
+    private List<InlineKeyboardButton> buildOrderStatisticsButtons() {
+        return List.of(buttonBuilder.buildButton(EmojiParser.parseToUnicode(":chart_with_upwards_trend: Ordered Statistics"),
+                                                 ORDERED_STATISTICS_MENU));
+    }
+
     private List<InlineKeyboardButton> buildRemoveOrderButtons() {
         return List.of(buttonBuilder.buildButtonByString(EmojiParser.parseToUnicode(":x: Remove order"),
                                                          REMOVE_ORDER.getCommandString()));
@@ -404,6 +440,25 @@ public class CustomButtonBuilder {
         return List.of(
                 buttonBuilder.buildButton(EmojiParser.parseToUnicode(":hourglass_flowing_sand: Processing order"),
                                           PROCESSING_ORDERS_MENU));
+    }
+
+    private List<InlineKeyboardButton> buildGlobalStatisticsButtons() {
+        return List.of(
+                buttonBuilder.buildButtonByString(EmojiParser.parseToUnicode(":earth_asia: Global"),
+                                          mergeBotCommand(ORDERED_STATISTICS_MENU,
+                                                          GLOBAL_ORDERED_STATISTICS_MENU)));
+    }
+
+    private List<InlineKeyboardButton> buildUserStatisticsButtons() {
+        return List.of(
+                buttonBuilder.buildButtonByString(EmojiParser.parseToUnicode(":bust_in_silhouette: User"),
+                                                  mergeBotCommand(ORDERED_STATISTICS_MENU,
+                                                                  USER_ORDERED_STATISTICS_MENU)));
+    }
+
+    private List<InlineKeyboardButton> buildBackToOrderedStatisticsMenuButtons() {
+        return List.of(buttonBuilder.buildButtonByString(EmojiParser.parseToUnicode(":arrow_left: Back"),
+                                                         mergeBotCommand(BACK, ORDERED_STATISTICS_MENU)));
     }
 
     private static String buildCoalOrderCommand(final Long value) {

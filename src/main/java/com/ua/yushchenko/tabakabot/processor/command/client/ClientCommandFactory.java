@@ -34,6 +34,7 @@ public class ClientCommandFactory {
                                 final @NonNull SendRequestOrderCommand sendRequestOrderCommand,
                                 final @NonNull RemoveOrderCommand removeOrderCommand,
                                 final @NonNull OrderStatusCommand orderStatusCommand,
+                                final @NonNull OrderedStatisticsMenuCommand orderedStatisticsMenuCommand,
                                 final @NonNull BackCommand backCommand) {
 
         commandMap = new HashMap<>();
@@ -47,6 +48,7 @@ public class ClientCommandFactory {
         commandMap.put(TobaccoBotCommand.SEND_ORDER_REQUEST, sendRequestOrderCommand);
         commandMap.put(TobaccoBotCommand.REMOVE_ORDER, removeOrderCommand);
         commandMap.put(TobaccoBotCommand.ORDER_STATUS, orderStatusCommand);
+        commandMap.put(TobaccoBotCommand.ORDERED_STATISTICS_MENU, orderedStatisticsMenuCommand);
         commandMap.put(TobaccoBotCommand.BACK, backCommand);
     }
 

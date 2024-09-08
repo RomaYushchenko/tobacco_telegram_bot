@@ -25,6 +25,9 @@ public enum TobaccoBotCommand {
     BACK("back"),
     REMOVE_ORDER("remove_order"),
     ORDER_STATUS("order_status"),
+    ORDERED_STATISTICS_MENU("osm"),
+    GLOBAL_ORDERED_STATISTICS_MENU("global_osm"),
+    USER_ORDERED_STATISTICS_MENU("user_osm"),
 
     //ADMIN COMMANDS
     GET_ALL_ORDERS("get_all_orders"),

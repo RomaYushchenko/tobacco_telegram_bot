@@ -96,6 +96,24 @@ public class OrderService {
      * @param userId ID of user
      * @return list of Planned {@link Order}s by user ID
      */
+    public List<Order> getCompletedOrdersByUserId(final Long userId) {
+        log.info("getPlannedOrdersByUserId.E: User ID: {}", userId);
+
+        List<Order> orders = orderRepository.findAllByUserIdAndOrderStatus(userId, OrderStatus.COMPLETED)
+                                            .stream()
+                                            .map(orderMapper::dbToDomain)
+                                            .collect(Collectors.toList());
+
+        log.info("getPlannedOrdersByUserId.X: User ID: {}, Orders: {}", userId, orders);
+        return orders;
+    }
+
+    /**
+     * Gets list of Planned {@link Order}s by user ID
+     *
+     * @param userId ID of user
+     * @return list of Planned {@link Order}s by user ID
+     */
     public List<Order> getOrderedOrdersByUserId(final Long userId) {
         log.info("getOrderedOrdersByUserId.E: User ID: {}", userId);
 

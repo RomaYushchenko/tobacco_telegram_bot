@@ -5,7 +5,6 @@ import java.util.List;
 
 import com.ua.yushchenko.tabakabot.model.enums.ItemType;
 import com.ua.yushchenko.tabakabot.model.persistence.ItemDb;
-import com.ua.yushchenko.tabakabot.processor.command.client.BackCommand;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 

@@ -5,6 +5,7 @@ import static com.ua.yushchenko.tabakabot.model.enums.TobaccoBotCommand.BACK;
 import java.util.List;
 import java.util.Objects;
 
+import com.ua.yushchenko.tabakabot.builder.ui.client.OrderedStatisticsMenuBuilder;
 import com.ua.yushchenko.tabakabot.builder.ui.client.TobaccoMenuBuilder;
 import com.ua.yushchenko.tabakabot.builder.ui.client.TobaccoOrderListMenuBuilder;
 import com.ua.yushchenko.tabakabot.model.domain.UserRequestModel;
@@ -31,10 +32,12 @@ public class BackCommand implements TobaccoCommand {
     private final TobaccoMenuBuilder tobaccoMenuBuilder;
     @NonNull
     private final TobaccoOrderListMenuBuilder orderListMenuBuilder;
+    @NonNull
+    private final OrderedStatisticsMenuBuilder orderedStatisticsMenuBuilder;
 
     @Override
     public BotApiMethod<?> buildMessage(final UserRequestModel model) {
-        log.debug("execute.E: Processing {} command", getCommand());
+        log.debug("buildMessage.E: Processing {} command", getCommand());
 
         final List<Object> data = model.getTobaccoBotCommands();
         final Long chatId = model.getChatId();
@@ -47,18 +50,24 @@ public class BackCommand implements TobaccoCommand {
             return null;
         }
 
-        log.info("execute.E: Processing second {} command", secondCommand);
+        log.info("buildMessage.E: Processing second {} command", secondCommand);
 
         switch (secondCommand) {
             case START -> {
                 final var sendMessage = tobaccoMenuBuilder.buildBackToTobaccoMenu(chatId, messageId);
-                log.info("execute.X: Processed second {} command", secondCommand);
+                log.info("buildMessage.X: Processed second {} command", secondCommand);
                 return sendMessage;
             }
             case REMOVE_ORDER -> {
                 final var sendMessage =
                         orderListMenuBuilder.buildTobaccoOrderListMenu(chatId, messageId, model.getUser());
-                log.info("execute.X: Processed second {} command", secondCommand);
+                log.info("buildMessage.X: Processed second {} command", secondCommand);
+                return sendMessage;
+            }
+            case ORDERED_STATISTICS_MENU -> {
+                final var sendMessage =
+                        orderedStatisticsMenuBuilder.buildOrderedStatisticsMenu(chatId, messageId);
+                log.info("buildMessage.X: Processed second {} command", secondCommand);
                 return sendMessage;
             }
             default -> {
