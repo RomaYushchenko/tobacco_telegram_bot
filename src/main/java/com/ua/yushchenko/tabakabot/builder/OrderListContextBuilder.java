@@ -63,6 +63,11 @@ public class OrderListContextBuilder {
 
         final User user = userService.getUserById(userId);
 
+        if (Objects.isNull(user)) {
+            log.warn("Cannot find User [ID:{}]. Skip building Order List Contexts", userId);
+            return List.of();
+        }
+
         final List<OrderListContext> orderListContexts = new ArrayList<>();
 
         ordersToTobaccoId.forEach((tobaccoItemId, orders) -> {
