@@ -48,7 +48,7 @@ public class TobaccoAdminBotProcessor extends TelegramWebhookBot {
             final TobaccoCommand tobaccoCommand = adminCommandFactory.retrieveCommand(model.getTobaccoBotCommands());
 
             if (tobaccoCommand == null) {
-                log.warn("onWebhookUpdateReceived.X: [CLIENT] Don't found bot command");
+                log.warn("onWebhookUpdateReceived.X: [ADMIN] Don't found bot command");
                 return null;
             }
 

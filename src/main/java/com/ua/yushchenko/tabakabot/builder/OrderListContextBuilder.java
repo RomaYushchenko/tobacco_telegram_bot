@@ -16,6 +16,7 @@ import com.ua.yushchenko.tabakabot.model.enums.ItemType;
 import com.ua.yushchenko.tabakabot.service.ItemService;
 import com.ua.yushchenko.tabakabot.service.TobaccoService;
 import com.ua.yushchenko.tabakabot.service.UserService;
+import com.ua.yushchenko.tabakabot.utility.TobaccoUtility;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -80,7 +81,7 @@ public class OrderListContextBuilder {
 
             final ItemType itemType = tobaccoItem.getItemType();
             final int weight = tobaccoItem.getWeight();
-            final int cost = getCostTobacco(itemType, weight, tobaccoToType) * orders.size();
+            final int cost = TobaccoUtility.getCostTobacco(itemType, weight, tobaccoToType) * orders.size();
 
             final var orderListContext = OrderListContext.builder()
                                                          .tobaccoItemId(tobaccoItemId)
@@ -96,25 +97,5 @@ public class OrderListContextBuilder {
         });
 
         return orderListContexts;
-    }
-
-    private int getCostTobacco(final ItemType tobaccoType,
-                               final int weight,
-                               final Map<ItemType, List<Tobacco>> tobaccoToType) {
-        if (Objects.equals(tobaccoType, ItemType.COAL)) {
-            return 240;
-        } else {
-            final Tobacco tobacco = tobaccoToType.get(tobaccoType).get(0);
-            return getCostByWeight(tobacco, weight);
-        }
-    }
-
-    private int getCostByWeight(final Tobacco tobacco, final int weight) {
-        return switch (weight) {
-            case 50 -> tobacco.getCost25();
-            case 100 -> tobacco.getCost100();
-            case 250 -> tobacco.getCost250();
-            default -> 0;
-        };
     }
 }
