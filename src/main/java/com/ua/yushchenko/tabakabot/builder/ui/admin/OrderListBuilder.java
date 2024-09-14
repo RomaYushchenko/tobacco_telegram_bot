@@ -1,6 +1,7 @@
 package com.ua.yushchenko.tabakabot.builder.ui.admin;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -171,6 +172,7 @@ public class OrderListBuilder {
         final AtomicInteger countOrder = new AtomicInteger(0);
 
         orderListContexts.stream()
+                         .sorted(Comparator.comparing(OrderListContext::getTobaccoItemId))
                          .collect(Collectors.groupingBy(OrderListContext::getTobaccoItemId))
                          .forEach((tobaccoItemId, contexts) -> {
 

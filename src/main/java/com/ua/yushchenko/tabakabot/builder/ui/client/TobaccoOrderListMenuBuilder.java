@@ -1,10 +1,12 @@
 package com.ua.yushchenko.tabakabot.builder.ui.client;
 
+import java.util.Comparator;
 import java.util.List;
 
 import com.ua.yushchenko.tabakabot.builder.OrderListContextBuilder;
 import com.ua.yushchenko.tabakabot.builder.ui.CustomButtonBuilder;
 import com.ua.yushchenko.tabakabot.model.domain.Order;
+import com.ua.yushchenko.tabakabot.model.domain.OrderListContext;
 import com.ua.yushchenko.tabakabot.model.domain.User;
 import com.ua.yushchenko.tabakabot.service.OrderService;
 import lombok.NonNull;
@@ -121,6 +123,8 @@ public class TobaccoOrderListMenuBuilder {
         final StringBuilder tobaccoOrderListInfo = new StringBuilder();
 
         orderListContextBuilder.buildOrderListContexts(userId, userOrders)
+                               .stream()
+                               .sorted(Comparator.comparing(OrderListContext::getTobaccoItemId))
                                .forEach(orderListContext -> {
                                    tobaccoOrderListInfo.append("\t\t\t")
                                                        .append(orderListContext.getTobaccoItemId())

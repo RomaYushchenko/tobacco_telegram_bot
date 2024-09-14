@@ -2,6 +2,7 @@ package com.ua.yushchenko.tabakabot.builder.ui.client;
 
 import static java.util.stream.Collectors.joining;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -48,6 +49,7 @@ public class TobaccoOrderMenuBuilder {
         final List<Item> items = itemService.getAvailableItemsByType(itemType);
         final List<Long> itemIds = items.stream()
                                         .map(Item::getItemId)
+                                        .sorted()
                                         .collect(Collectors.toList());
 
         final var replyMarkup = InlineKeyboardMarkup.builder()
@@ -67,8 +69,9 @@ public class TobaccoOrderMenuBuilder {
     }
 
 
-    private String getReadableAllTobaccoItems(List<Item> tobaccoItemsByType) {
+    private String getReadableAllTobaccoItems(final List<Item> tobaccoItemsByType) {
         return tobaccoItemsByType.stream()
+                                 .sorted(Comparator.comparing(Item::getItemId))
                                  .map(TobaccoOrderMenuBuilder::buildTobaccoItemInfo)
                                  .collect(joining("\n"));
     }
