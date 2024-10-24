@@ -227,6 +227,8 @@ public class LoadTobaccoBuilder {
     }
 
     private List<String> getTobaccosFromBotMessage(final String messageText) {
+        log.info("getTobaccosFromBotMessage.E: Parsing message text: {}", messageText);
+
         final String[] tobaccos = messageText.split("\n");
         final List<String> tobaccosList = new ArrayList<>(List.of(tobaccos));
         tobaccosList.remove(0);
