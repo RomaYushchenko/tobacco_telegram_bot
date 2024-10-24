@@ -21,6 +21,7 @@ import com.ua.yushchenko.tabakabot.service.ItemService;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 
@@ -56,6 +57,7 @@ public class LoadTobaccoBuilder {
         final Map<String, Item> itemsToLoadToDescription =
                 tobaccosList.stream()
                             .map(LoadTobaccoBuilder::buildItemOf420Light)
+                            .filter(Objects::nonNull)
                             .collect(Collectors.toMap(Item::getDescription, Function.identity()));
 
         processLoadItemsToDisable(currentItemsToDescription, itemsToLoadToDescription);
@@ -86,6 +88,7 @@ public class LoadTobaccoBuilder {
         final Map<String, Item> itemsToLoadToDescription =
                 tobaccosList.stream()
                             .map(LoadTobaccoBuilder::buildItemOf420Classic)
+                            .filter(Objects::nonNull)
                             .distinct()
                             .collect(Collectors.toMap(Item::getDescription, Function.identity()));
 
@@ -100,6 +103,11 @@ public class LoadTobaccoBuilder {
     }
 
     private static Item buildItemOf420Classic(final String tobaccoItem) {
+        if  (StringUtils.isBlank(tobaccoItem) || tobaccoItem.length() < 3) {
+            log.warn("buildItemOf420Classic.X: tobaccoItem string is not valid. {}", tobaccoItem);
+            return null;
+        }
+
         final String weight = tobaccoItem.substring(tobaccoItem.indexOf(", ") + 2,
                                                     tobaccoItem.indexOf(")") - 2);
         final String description = tobaccoItem.substring(
@@ -114,6 +122,11 @@ public class LoadTobaccoBuilder {
     }
 
     private static Item buildItemOf420Light(final String tobaccoItem) {
+        if  (StringUtils.isBlank(tobaccoItem) || tobaccoItem.length() < 3) {
+            log.warn("buildItemOf420Light.X: tobaccoItem string is not valid. {}", tobaccoItem);
+            return null;
+        }
+
         final String weight =
                 tobaccoItem.substring(tobaccoItem.indexOf("(") + 1,
                                       tobaccoItem.indexOf(")") - 2);
