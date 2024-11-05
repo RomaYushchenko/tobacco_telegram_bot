@@ -18,6 +18,7 @@ public class UserRequestModel {
 
     final Long chatId;
     final Integer messageId;
+    final Integer date;
     @ToString.Exclude
     final String messageText;
     final User user;

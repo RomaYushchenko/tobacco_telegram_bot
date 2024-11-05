@@ -51,6 +51,7 @@ public class UserRequestModelBuilder {
                                 .chatId(chatId)
                                 .user(user)
                                 .messageId(message.getMessageId())
+                                .date(message.getDate())
                                 .messageText(message.getText())
                                 .isCallbackQuery(update.hasCallbackQuery())
                                 .tobaccoBotCommands(getTobaccoBotCommands(update))
