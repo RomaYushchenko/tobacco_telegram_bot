@@ -39,7 +39,9 @@ public enum TobaccoBotCommand {
     PLANNED_MENU("pm"),
     REJECT_MENU("rm"),
     ORDERED_MENU("om"),
-    COMPLETED_ORDER_MENU("com");
+    COMPLETED_ORDER_MENU("com"),
+    REJECT_ORDERED_MENU_ITEM("romi"),
+    REJECT_ORDERED_ITEM("roi");
 
 
     private final String commandString;

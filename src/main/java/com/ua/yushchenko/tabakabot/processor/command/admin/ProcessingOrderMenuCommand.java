@@ -4,6 +4,8 @@ import static com.ua.yushchenko.tabakabot.model.enums.TobaccoBotCommand.COMPLETE
 import static com.ua.yushchenko.tabakabot.model.enums.TobaccoBotCommand.ORDERED_MENU;
 import static com.ua.yushchenko.tabakabot.model.enums.TobaccoBotCommand.PLANNED_MENU;
 import static com.ua.yushchenko.tabakabot.model.enums.TobaccoBotCommand.REJECT_MENU;
+import static com.ua.yushchenko.tabakabot.model.enums.TobaccoBotCommand.REJECT_ORDERED_ITEM;
+import static com.ua.yushchenko.tabakabot.model.enums.TobaccoBotCommand.REJECT_ORDERED_MENU_ITEM;
 
 import java.util.List;
 import java.util.Objects;
@@ -76,7 +78,7 @@ public class ProcessingOrderMenuCommand implements TobaccoCommand {
                         orderService.updateOrders(ordersToRejected);
                     }
 
-                    final var sendMessage = processOrderMenuBuilder.buildRejectOrderMenu(chatId, messageId);
+                    final var sendMessage = processOrderMenuBuilder.buildRejectPlannedOrderMenu(chatId, messageId);
 
                     log.info("execute.X: [ADMIN] Processed {} commands",
                              List.of(getCommand(), PLANNED_MENU, REJECT_MENU));
@@ -103,11 +105,46 @@ public class ProcessingOrderMenuCommand implements TobaccoCommand {
                         orderService.updateOrders(ordersToCompleted);
                     }
 
-                    final var sendMessage = processOrderMenuBuilder.buildCompletedOrderMenu(chatId, messageId);
+                    final var sendMessage = processOrderMenuBuilder.buildCompletedOrderedOrderMenu(chatId, messageId);
 
                     log.info("execute.X: [ADMIN] Processed {} commands",
                              List.of(getCommand(), ORDERED_MENU, COMPLETED_ORDER_MENU));
                     return sendMessage;
+
+                } else if (Objects.equals(tobaccoBotCommands.get(2), REJECT_ORDERED_MENU_ITEM)) {
+                    if (tobaccoBotCommands.size() == 4) {
+                        final Long userId = (Long) tobaccoBotCommands.get(3);
+                        final var sendMessage = processOrderMenuBuilder.buildListOfOrderByUserMenu(chatId, messageId, userId);
+                        log.info("execute.X: [ADMIN] Processed {} commands", List.of(getCommand(), ORDERED_MENU, REJECT_ORDERED_MENU_ITEM));
+                        return sendMessage;
+                    }
+
+                    final var sendMessage = processOrderMenuBuilder.buildRejectedOrderedOrderMenu(chatId, messageId);
+
+                    log.info("execute.X: [ADMIN] Processed {} commands",
+                             List.of(getCommand(), ORDERED_MENU, REJECT_ORDERED_MENU_ITEM));
+
+                    return sendMessage;
+
+                } else if (Objects.equals(tobaccoBotCommands.get(2), REJECT_ORDERED_ITEM)) {
+                    if (tobaccoBotCommands.size() == 5) {
+                        final Long userId = (Long) tobaccoBotCommands.get(3);
+                        final Long itemId = (Long) tobaccoBotCommands.get(4);
+
+                        final Order order = orderService.getFirstOrderedOrderByUserIdAndItemId(userId, itemId);
+
+                        if (Objects.nonNull(order)) {
+                            Order rejectedOrder = order.toBuilder()
+                                                       .orderStatus(OrderStatus.REJECTED)
+                                                       .build();
+
+                            orderService.updateOrders(List.of(rejectedOrder));
+                        }
+
+                        final var sendMessage = processOrderMenuBuilder.buildListOfOrderByUserMenu(chatId, messageId, userId);
+                        log.info("execute.X: [ADMIN] Processed {} commands", List.of(getCommand(), ORDERED_MENU, REJECT_ORDERED_ITEM));
+                        return sendMessage;
+                    }
                 }
             }
         }

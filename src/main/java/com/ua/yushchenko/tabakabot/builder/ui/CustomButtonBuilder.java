@@ -16,6 +16,8 @@ import static com.ua.yushchenko.tabakabot.model.enums.TobaccoBotCommand.ORDER_ST
 import static com.ua.yushchenko.tabakabot.model.enums.TobaccoBotCommand.PLANNED_MENU;
 import static com.ua.yushchenko.tabakabot.model.enums.TobaccoBotCommand.PROCESSING_ORDERS_MENU;
 import static com.ua.yushchenko.tabakabot.model.enums.TobaccoBotCommand.REJECT_MENU;
+import static com.ua.yushchenko.tabakabot.model.enums.TobaccoBotCommand.REJECT_ORDERED_ITEM;
+import static com.ua.yushchenko.tabakabot.model.enums.TobaccoBotCommand.REJECT_ORDERED_MENU_ITEM;
 import static com.ua.yushchenko.tabakabot.model.enums.TobaccoBotCommand.REMOVE_ORDER;
 import static com.ua.yushchenko.tabakabot.model.enums.TobaccoBotCommand.SEND_ORDER_REQUEST;
 import static com.ua.yushchenko.tabakabot.model.enums.TobaccoBotCommand.START;
@@ -28,6 +30,7 @@ import java.util.Set;
 
 import com.google.common.collect.Lists;
 import com.ua.yushchenko.tabakabot.model.domain.Item;
+import com.ua.yushchenko.tabakabot.model.domain.OrderListContext;
 import com.ua.yushchenko.tabakabot.model.domain.Tobacco;
 import com.ua.yushchenko.tabakabot.model.enums.TobaccoBotCommand;
 import com.vdurmont.emoji.EmojiParser;
@@ -181,9 +184,30 @@ public class CustomButtonBuilder {
         final List<List<InlineKeyboardButton>> orderedMenuButtons = new ArrayList<>();
 
         orderedMenuButtons.add(buildCompletedMenuButtons());
+        orderedMenuButtons.add(buildRejectedOrderedMenuButtons());
         orderedMenuButtons.add(buildBackToProcessingOrderButtons());
 
         return orderedMenuButtons;
+    }
+
+    /**
+     * Build list of {@link InlineKeyboardButton} for Admin Reject Ordered menu
+     *
+     * @param userId            ID of user
+     * @param orderListContexts list of {@link OrderListContext}
+     * @return list of {@link InlineKeyboardButton} for Admin Reject Ordered menu
+     */
+    public List<List<InlineKeyboardButton>> buildKeyBoardToAdminRejectOrderedMenu(final Long userId,
+                                                                                  final List<OrderListContext> orderListContexts) {
+        final List<List<InlineKeyboardButton>> rejectOrderedMenuButtons = new ArrayList<>();
+
+        final List<Long> itemIds = orderListContexts.stream()
+                                                    .map(OrderListContext::getTobaccoItemId)
+                                                    .toList();
+
+        rejectOrderedMenuButtons.addAll(getRejectedOrderedItemButtonRows(userId, itemIds));
+        rejectOrderedMenuButtons.add(buildBackToProcessingOrderButtons());
+        return rejectOrderedMenuButtons;
     }
 
     /**
@@ -192,7 +216,7 @@ public class CustomButtonBuilder {
      * @param userIds list of IDs of user
      * @return list of {@link InlineKeyboardButton} for Admin Reject Order menu
      */
-    public List<List<InlineKeyboardButton>> buildKeyBoardToAdminRejectOrderMenu(final Set<Long> userIds) {
+    public List<List<InlineKeyboardButton>> buildKeyBoardToAdminRejectPlannedOrderMenu(final Set<Long> userIds) {
         final List<List<InlineKeyboardButton>> rejectOrderMenuButtons = new ArrayList<>();
 
         rejectOrderMenuButtons.addAll(getRemoveRejectedItemsButtonRows(new ArrayList<>(userIds)));
@@ -207,10 +231,25 @@ public class CustomButtonBuilder {
      * @param userIds list of IDs of user
      * @return list of {@link InlineKeyboardButton} for Admin Completed Order menu
      */
-    public List<List<InlineKeyboardButton>> buildKeyBoardToAdminCompletedOrderMenu(final Set<Long> userIds) {
+    public List<List<InlineKeyboardButton>> buildKeyBoardToAdminCompletedOrderedOrderMenu(final Set<Long> userIds) {
         final List<List<InlineKeyboardButton>> completedOrderMenuButtons = new ArrayList<>();
 
         completedOrderMenuButtons.addAll(getRemoveCompletedItemsButtonRows(new ArrayList<>(userIds)));
+        completedOrderMenuButtons.add(buildBackToOrderedButtons());
+
+        return completedOrderMenuButtons;
+    }
+
+    /**
+     * Build list of {@link InlineKeyboardButton} for Admin Rejected Ordered Order menu
+     *
+     * @param userIds list of IDs of user
+     * @return list of {@link InlineKeyboardButton} for Admin Rejected Ordered Order menu
+     */
+    public List<List<InlineKeyboardButton>> buildKeyBoardToAdminRejectedOrderedOrderMenu(final Set<Long> userIds) {
+        final List<List<InlineKeyboardButton>> completedOrderMenuButtons = new ArrayList<>();
+
+        completedOrderMenuButtons.addAll(getRejectOrderedItemsButtonRows(new ArrayList<>(userIds)));
         completedOrderMenuButtons.add(buildBackToOrderedButtons());
 
         return completedOrderMenuButtons;
@@ -288,6 +327,22 @@ public class CustomButtonBuilder {
                     .toList();
     }
 
+    private List<List<InlineKeyboardButton>> getRejectedOrderedItemButtonRows(final Long userId,
+                                                                              final List<Long> orderIds) {
+        return Lists.partition(orderIds, 6)
+                    .stream()
+                    .map(list -> buildRowButtonOfRejectedOrderedItems(userId, list))
+                    .toList();
+    }
+
+    private List<InlineKeyboardButton> buildRowButtonOfRejectedOrderedItems(final Long userId,
+                                                                            final List<Long> orderIds) {
+        return orderIds.stream()
+                       .map(orderId -> buildRejectedOrderedItemButton(userId, orderId))
+                       .distinct()
+                       .toList();
+    }
+
     private List<InlineKeyboardButton> buildRowButtonOfRemoveRejectedItems(final List<Long> userIds) {
         return userIds.stream()
                       .map(this::buildRemoveRejectedItemsButton)
@@ -302,9 +357,23 @@ public class CustomButtonBuilder {
                     .toList();
     }
 
+    private List<List<InlineKeyboardButton>> getRejectOrderedItemsButtonRows(final List<Long> userIds) {
+        return Lists.partition(userIds, 6)
+                    .stream()
+                    .map(this::buildRowButtonOfRejectOrderedItems)
+                    .toList();
+    }
+
     private List<InlineKeyboardButton> buildRowButtonOfRemoveCompletedItems(final List<Long> userIds) {
         return userIds.stream()
                       .map(this::buildRemoveCompletedItemsButton)
+                      .distinct()
+                      .toList();
+    }
+
+    private List<InlineKeyboardButton> buildRowButtonOfRejectOrderedItems(final List<Long> userIds) {
+        return userIds.stream()
+                      .map(this::buildRejectOrderedItemsButton)
                       .distinct()
                       .toList();
     }
@@ -355,21 +424,41 @@ public class CustomButtonBuilder {
                                                                  userId));
     }
 
+    private InlineKeyboardButton buildRejectedOrderedItemButton(final Long userId, final Long itemId) {
+        return buttonBuilder.buildButtonByString(String.valueOf(itemId),
+                                                 mergeBotCommand(PROCESSING_ORDERS_MENU, ORDERED_MENU,
+                                                                 REJECT_ORDERED_ITEM,
+                                                                 userId, itemId));
+    }
+
     private List<InlineKeyboardButton> buildOrderedButtons() {
         return List.of(buttonBuilder.buildButtonByString(EmojiParser.parseToUnicode(":incoming_envelope: Ordered"),
                                                          mergeBotCommand(PROCESSING_ORDERS_MENU, ORDERED_MENU)));
     }
 
     private List<InlineKeyboardButton> buildCompletedMenuButtons() {
-        return List.of(buttonBuilder.buildButtonByString(EmojiParser.parseToUnicode(":wastebasket: Completed"),
+        return List.of(buttonBuilder.buildButtonByString(EmojiParser.parseToUnicode(":white_check_mark: Completed"),
                                                          mergeBotCommand(PROCESSING_ORDERS_MENU, ORDERED_MENU,
                                                                          COMPLETED_ORDER_MENU)));
+    }
+
+    private List<InlineKeyboardButton> buildRejectedOrderedMenuButtons() {
+        return List.of(buttonBuilder.buildButtonByString(EmojiParser.parseToUnicode(":wastebasket: Reject"),
+                                                         mergeBotCommand(PROCESSING_ORDERS_MENU, ORDERED_MENU,
+                                                                         REJECT_ORDERED_MENU_ITEM)));
     }
 
     private InlineKeyboardButton buildRemoveCompletedItemsButton(final Long userId) {
         return buttonBuilder.buildButtonByString(String.valueOf(userId),
                                                  mergeBotCommand(PROCESSING_ORDERS_MENU, ORDERED_MENU,
                                                                  COMPLETED_ORDER_MENU,
+                                                                 userId));
+    }
+
+    private InlineKeyboardButton buildRejectOrderedItemsButton(final Long userId) {
+        return buttonBuilder.buildButtonByString(String.valueOf(userId),
+                                                 mergeBotCommand(PROCESSING_ORDERS_MENU, ORDERED_MENU,
+                                                                 REJECT_ORDERED_MENU_ITEM,
                                                                  userId));
     }
 
@@ -409,8 +498,9 @@ public class CustomButtonBuilder {
     }
 
     private List<InlineKeyboardButton> buildOrderStatisticsButtons() {
-        return List.of(buttonBuilder.buildButton(EmojiParser.parseToUnicode(":chart_with_upwards_trend: Ordered Statistics"),
-                                                 ORDERED_STATISTICS_MENU));
+        return List.of(
+                buttonBuilder.buildButton(EmojiParser.parseToUnicode(":chart_with_upwards_trend: Ordered Statistics"),
+                                          ORDERED_STATISTICS_MENU));
     }
 
     private List<InlineKeyboardButton> buildRemoveOrderButtons() {
@@ -432,7 +522,8 @@ public class CustomButtonBuilder {
 
     private List<InlineKeyboardButton> buildUserListAdminButtons() {
         return List.of(buttonBuilder.buildButton(EmojiParser.parseToUnicode("\uD83D\uDC68\u200D\uD83D\uDC69\u200D" +
-                                                                                    "\uD83D\uDC67\u200D\uD83D\uDC66 Gat All users"),
+                                                                                    "\uD83D\uDC67\u200D\uD83D\uDC66 " +
+                                                                                    "Gat All users"),
                                                  GET_ALL_USERS));
     }
 
@@ -445,8 +536,8 @@ public class CustomButtonBuilder {
     private List<InlineKeyboardButton> buildGlobalStatisticsButtons() {
         return List.of(
                 buttonBuilder.buildButtonByString(EmojiParser.parseToUnicode(":earth_asia: Global"),
-                                          mergeBotCommand(ORDERED_STATISTICS_MENU,
-                                                          GLOBAL_ORDERED_STATISTICS_MENU)));
+                                                  mergeBotCommand(ORDERED_STATISTICS_MENU,
+                                                                  GLOBAL_ORDERED_STATISTICS_MENU)));
     }
 
     private List<InlineKeyboardButton> buildUserStatisticsButtons() {

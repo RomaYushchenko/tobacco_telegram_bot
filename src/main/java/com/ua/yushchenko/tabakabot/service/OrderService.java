@@ -97,14 +97,14 @@ public class OrderService {
      * @return list of Planned {@link Order}s by user ID
      */
     public List<Order> getCompletedOrdersByUserId(final Long userId) {
-        log.info("getPlannedOrdersByUserId.E: User ID: {}", userId);
+        log.info("getCompletedOrdersByUserId.E: User ID: {}", userId);
 
         List<Order> orders = orderRepository.findAllByUserIdAndOrderStatus(userId, OrderStatus.COMPLETED)
                                             .stream()
                                             .map(orderMapper::dbToDomain)
                                             .collect(Collectors.toList());
 
-        log.info("getPlannedOrdersByUserId.X: User ID: {}, Orders: {}", userId, orders);
+        log.info("getCompletedOrdersByUserId.X: User ID: {}, Orders: {}", userId, orders);
         return orders;
     }
 
@@ -124,6 +124,27 @@ public class OrderService {
 
         log.info("getOrderedOrdersByUserId.X: User ID: {}, Orders: {}", userId, orders);
         return orders;
+    }
+
+    /**
+     * Get first {@link Order} with {@link OrderStatus#ORDERED} by ID of user and ID of tobacco item
+     *
+     * @param userId        ID of user
+     * @param tobaccoItemId ID of tobacco item
+     * @return {@link Order} with {@link OrderStatus#ORDERED} by ID of user and ID of tobacco item
+     */
+    public Order getFirstOrderedOrderByUserIdAndItemId(final Long userId, final Long tobaccoItemId) {
+        log.info("getFirstOrderedOrderByUserIdAndItemId.E: User ID: {}, tobacco item ID: {}", userId, tobaccoItemId);
+
+        final Order order = orderRepository.findAllByUserIdAndTobaccoItemIdAndOrderStatus(userId, tobaccoItemId,
+                                                                                          OrderStatus.ORDERED)
+                                           .stream()
+                                           .map(orderMapper::dbToDomain)
+                                           .findFirst()
+                                           .orElse(null);
+
+        log.info("getFirstOrderedOrderByUserIdAndItemId.X: Order {}", order);
+        return order;
     }
 
     /**
@@ -156,7 +177,17 @@ public class OrderService {
      * @param orders list of {@link Order} to update
      */
     public void updateOrders(final List<Order> orders) {
-        orders.forEach(order -> orderRepository.save(orderMapper.domainToDb(order)));
+        log.info("updateOrders.E:");
+
+        orders.forEach(order -> {
+            log.info("updateOrders.E: Updating order...");
+
+            orderRepository.save(orderMapper.domainToDb(order));
+
+            log.info("updateOrders.E: Updated order:{}", order);
+        });
+
+        log.info("updateOrders.X:");
     }
 
     /**

@@ -47,11 +47,11 @@ public class TobaccoBotCommandUtility {
     }
 
     /**
-     * Merge three {@link TobaccoBotCommand}
+     * Merge three {@link TobaccoBotCommand} and user ID
      *
      * @param firstCommand  first bot command
      * @param secondCommand second bot command
-     * @return merged two {@link TobaccoBotCommand}. Ex: firstCommand:secondCommand:thredCommand
+     * @return merged two {@link TobaccoBotCommand}. Ex: firstCommand:secondCommand:thredCommand:1111
      */
     public static String mergeBotCommand(final TobaccoBotCommand firstCommand,
                                          final TobaccoBotCommand secondCommand,
@@ -60,6 +60,24 @@ public class TobaccoBotCommandUtility {
         return firstCommand.getCommandString() + ":" + secondCommand.getCommandString() +
                 ":" + theredCommand.getCommandString() +
                 ":" + userId;
+    }
+
+    /**
+     * Merge three {@link TobaccoBotCommand} and user ID and item ID
+     *
+     * @param firstCommand  first bot command
+     * @param secondCommand second bot command
+     * @return merged two {@link TobaccoBotCommand}. Ex: firstCommand:secondCommand:thredCommand:111:222
+     */
+    public static String mergeBotCommand(final TobaccoBotCommand firstCommand,
+                                         final TobaccoBotCommand secondCommand,
+                                         final TobaccoBotCommand theredCommand,
+                                         final Long userId,
+                                         final Long itemId) {
+        return firstCommand.getCommandString() + ":" + secondCommand.getCommandString() +
+                ":" + theredCommand.getCommandString() +
+                ":" + userId +
+                ":" + itemId;
     }
 
     /**
@@ -127,26 +145,6 @@ public class TobaccoBotCommandUtility {
      * @param message Telegram message Entity
      * @return first text of Telegram message entity
      */
-    public static String getFirstTextOfMessageEntityBotCommand(final Message message) {
-        final String botCommand =
-                Optional.ofNullable(findFirstMessageEntityByCommandType(message, BOT_COMMAND))
-                        .map(MessageEntity::getText)
-                        .orElse(null);
-
-        if (botCommand == null) {
-            return null;
-        }
-
-        final String[] splitBotCommand = botCommand.split("/");
-        return splitBotCommand[1];
-    }
-
-    /**
-     * Gets first text of Telegram message entity and convert to TobaccoBotCommand
-     *
-     * @param message Telegram message Entity
-     * @return first text of Telegram message entity
-     */
     public static TobaccoBotCommand getFirstCommandOfMessageEntityBotCommand(final Message message) {
         final String botCommand =
                 Optional.ofNullable(findFirstMessageEntityByCommandType(message, BOT_COMMAND))
@@ -159,20 +157,5 @@ public class TobaccoBotCommandUtility {
 
         final String[] splitBotCommand = botCommand.split("/");
         return TobaccoBotCommand.getEnumByString(splitBotCommand[1]);
-    }
-
-    /**
-     * Gets first {@link TobaccoBotCommand}
-     *
-     * @param data Tobacco bot command
-     * @return {@link TobaccoBotCommand}
-     */
-    public static TobaccoBotCommand getFirstTobaccoBotCommand(final String data) {
-        if (data.contains(":")) {
-            final String[] splitCommands = data.split(":");
-            return TobaccoBotCommand.getEnumByString(splitCommands[0]);
-        }
-
-        return TobaccoBotCommand.getEnumByString(data);
     }
 }
