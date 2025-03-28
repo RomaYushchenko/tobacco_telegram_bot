@@ -3,6 +3,7 @@ package com.ua.yushchenko.tabakabot.common.setup;
 import static com.ua.yushchenko.tabakabot.model.enums.ItemType.COAL;
 import static com.ua.yushchenko.tabakabot.model.enums.ItemType.TOBACCO_420_CLASSIC;
 import static com.ua.yushchenko.tabakabot.model.enums.ItemType.TOBACCO_420_LIGHT;
+import static com.ua.yushchenko.tabakabot.model.enums.ItemType.TOBACCO_YUMMY;
 
 import com.ua.yushchenko.tabakabot.model.domain.Item;
 import com.ua.yushchenko.tabakabot.model.domain.Tobacco;
@@ -48,8 +49,8 @@ public class TobaccoItemSetUpData {
                                                .tobaccoName(TOBACCO_420_LIGHT)
                                                .tobaccoCommand(TobaccoBotCommand.TABAKA_420_LIGHT)
                                                .cost25(120)
-                                               .cost100(220)
-                                               .cost250(400)
+                                               .cost100(230)
+                                               .cost250(455)
                                                .build();
 
         final Tobacco tobacco420Classic = Tobacco.builder()
@@ -57,11 +58,21 @@ public class TobaccoItemSetUpData {
                                                  .tobaccoName(TOBACCO_420_CLASSIC)
                                                  .tobaccoCommand(TobaccoBotCommand.TABAKA_420_CLASSIC)
                                                  .cost25(120)
-                                                 .cost100(220)
-                                                 .cost250(400)
+                                                 .cost100(250)
+                                                 .cost250(500)
                                                  .build();
+
+        final Tobacco tobaccoYummy = Tobacco.builder()
+                                            .tobaccoId(3)
+                                            .tobaccoName(TOBACCO_YUMMY)
+                                            .tobaccoCommand(TobaccoBotCommand.TOBACCO_YUMMY)
+                                            .cost25(120)
+                                            .cost100(245)
+                                            .cost250(480)
+                                            .build();
 
         tobaccoService.saveTobacco(tobacco420Light);
         tobaccoService.saveTobacco(tobacco420Classic);
+        tobaccoService.saveTobacco(tobaccoYummy);
     }
 }
