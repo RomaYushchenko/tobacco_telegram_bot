@@ -12,6 +12,7 @@ public enum ItemType {
 
     TOBACCO_420_LIGHT("420 Light"),
     TOBACCO_420_CLASSIC("420 Classic"),
+    TOBACCO_YUMMY("Yummy"),
     COAL("Coal");
 
     private final String itemString;

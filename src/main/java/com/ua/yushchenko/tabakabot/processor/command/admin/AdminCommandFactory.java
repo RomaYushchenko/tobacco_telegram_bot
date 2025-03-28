@@ -26,6 +26,7 @@ public class AdminCommandFactory {
     public AdminCommandFactory(final @NonNull StartCommand startCommand,
                                final @NonNull Load420LightCommand load420LightCommand,
                                final @NonNull Load420ClassicCommand load420ClassicCommand,
+                               final @NonNull LoadYummyCommand loadYummyCommand,
                                final @NonNull GetAllOrdersByUserCommand getAllOrdersByUserCommand,
                                final @NonNull GetAllOrdersCommand getAllOrdersCommand,
                                final @NonNull GetAllUsersCommand getAllUsersCommand,
@@ -36,6 +37,7 @@ public class AdminCommandFactory {
         commandMap.put(TobaccoBotCommand.START, startCommand);
         commandMap.put(TobaccoBotCommand.LOAD_420_LIGHT, load420LightCommand);
         commandMap.put(TobaccoBotCommand.LOAD_420_CLASSIC, load420ClassicCommand);
+        commandMap.put(TobaccoBotCommand.LOAD_YUMMY, loadYummyCommand);
         commandMap.put(TobaccoBotCommand.GET_ALL_ORDERS_BY_USER, getAllOrdersByUserCommand);
         commandMap.put(TobaccoBotCommand.GET_ALL_ORDERS, getAllOrdersCommand);
         commandMap.put(TobaccoBotCommand.GET_ALL_USERS, getAllUsersCommand);

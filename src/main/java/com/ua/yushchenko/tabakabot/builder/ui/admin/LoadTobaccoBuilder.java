@@ -3,6 +3,7 @@ package com.ua.yushchenko.tabakabot.builder.ui.admin;
 
 import static com.ua.yushchenko.tabakabot.model.enums.ItemType.TOBACCO_420_CLASSIC;
 import static com.ua.yushchenko.tabakabot.model.enums.ItemType.TOBACCO_420_LIGHT;
+import static com.ua.yushchenko.tabakabot.model.enums.ItemType.TOBACCO_YUMMY;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -102,6 +103,38 @@ public class LoadTobaccoBuilder {
                           .build();
     }
 
+    /**
+     * Build {@link SendMessage} for Load Yummy
+     *
+     * @param chatId      ID of chat
+     * @param messageText text of message
+     * @return {@link SendMessage} for Load Yummy
+     */
+    public SendMessage buildLoadYummyTobacco(final Long chatId, final String messageText) {
+        final List<String> tobaccosList = getTobaccosFromBotMessage(messageText);
+
+        final Map<String, Item> currentItemsToDescription =
+                itemService.getItemsByType(TOBACCO_YUMMY)
+                           .stream()
+                           .collect(Collectors.toMap(Item::getDescription, Function.identity()));
+
+        final Map<String, Item> itemsToLoadToDescription =
+                tobaccosList.stream()
+                            .map(LoadTobaccoBuilder::buildItemOfYummy)
+                            .filter(Objects::nonNull)
+                            .distinct()
+                            .collect(Collectors.toMap(Item::getDescription, Function.identity()));
+
+        processLoadItemsToDisable(currentItemsToDescription, itemsToLoadToDescription);
+        processLoadItemsToAdd(currentItemsToDescription, itemsToLoadToDescription, TOBACCO_YUMMY);
+        processLoadItemsToAvailable(currentItemsToDescription, itemsToLoadToDescription);
+
+        return SendMessage.builder()
+                          .chatId(chatId)
+                          .text(TOBACCO_YUMMY.getItemString() + " was loaded")
+                          .build();
+    }
+
     private static Item buildItemOf420Classic(final String tobaccoItem) {
         if  (StringUtils.isBlank(tobaccoItem) || tobaccoItem.length() < 3) {
             log.warn("buildItemOf420Classic.X: tobaccoItem string is not valid. {}", tobaccoItem);
@@ -136,6 +169,26 @@ public class LoadTobaccoBuilder {
 
         return Item.builder()
                    .itemType(TOBACCO_420_LIGHT)
+                   .description(description)
+                   .weight(Integer.parseInt(weight))
+                   .build();
+    }
+
+    private static Item buildItemOfYummy(final String tobaccoItem) {
+        if  (StringUtils.isBlank(tobaccoItem) || tobaccoItem.length() < 3) {
+            log.warn("buildItemOfYummy.X: tobaccoItem string is not valid. {}", tobaccoItem);
+            return null;
+        }
+
+        final String weight =
+                tobaccoItem.substring(tobaccoItem.indexOf("(") + 1,
+                                      tobaccoItem.indexOf(")") - 2);
+        final String description = tobaccoItem.substring(
+                tobaccoItem.indexOf("Yummy") + "Yummy".length() + 1,
+                tobaccoItem.indexOf("(") - 1);
+
+        return Item.builder()
+                   .itemType(TOBACCO_YUMMY)
                    .description(description)
                    .weight(Integer.parseInt(weight))
                    .build();
@@ -213,11 +266,15 @@ public class LoadTobaccoBuilder {
             count = 50;
         }
 
+        if (Objects.equals(itemType, TOBACCO_YUMMY)) {
+            count = 200;
+        }
+
         final List<Item> itemsSortedById = values.stream()
                                                  .sorted(Comparator.comparing(Item::getItemId))
                                                  .toList();
 
-        if (values.size() > 0) {
+        if (!values.isEmpty()) {
             count = itemsSortedById.size() - 1;
         } else {
             return count;
