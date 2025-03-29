@@ -103,7 +103,7 @@ public class TobaccoBotCommandUtility {
         }
 
         return !CollectionUtils.isEmpty(
-                getMessageEntitiesByCommandType(message, BOT_COMMAND, LOAD_420_LIGHT, LOAD_420_CLASSIC));
+                getMessageEntitiesByCommandType(message, BOT_COMMAND, LOAD_420_LIGHT, LOAD_420_CLASSIC, LOAD_420_LIGHT));
     }
 
     /**

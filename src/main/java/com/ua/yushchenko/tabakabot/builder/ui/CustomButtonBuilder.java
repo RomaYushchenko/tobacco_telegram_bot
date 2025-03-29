@@ -27,6 +27,7 @@ import static com.ua.yushchenko.tabakabot.utility.TobaccoBotCommandUtility.merge
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import com.google.common.collect.Lists;
 import com.ua.yushchenko.tabakabot.model.domain.Item;
@@ -390,18 +391,21 @@ public class CustomButtonBuilder {
 
     private List<List<InlineKeyboardButton>> getTobaccoOrderButtonRows(final List<Long> tobaccoItemIds,
                                                                        final TobaccoBotCommand tobaccoBotCommand) {
+        final AtomicInteger counter = new AtomicInteger(1);
+
         return Lists.partition(tobaccoItemIds, 6)
                     .stream()
-                    .map(tobaccoItemIdsPart -> buildRowButtonOfAddOrder(tobaccoItemIdsPart, tobaccoBotCommand))
+                    .map(tobaccoItemIdsPart -> buildRowButtonOfAddOrder(counter, tobaccoItemIdsPart, tobaccoBotCommand))
                     .toList();
     }
 
-    private List<InlineKeyboardButton> buildRowButtonOfAddOrder(final List<Long> tobaccoItemIds,
+    private List<InlineKeyboardButton> buildRowButtonOfAddOrder(final AtomicInteger counter,
+                                                                final List<Long> tobaccoItemIds,
                                                                 final TobaccoBotCommand tobaccoBotCommand) {
         return tobaccoItemIds.stream()
                              .map(tobaccoItemId ->
                                           buttonBuilder.buildButtonByString(
-                                                  String.valueOf(tobaccoItemId),
+                                                  String.valueOf(counter.getAndIncrement()),
                                                   buildTobaccoOrderCommand(tobaccoBotCommand, tobaccoItemId)))
                              .distinct()
                              .toList();
