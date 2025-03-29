@@ -4,6 +4,7 @@ import static java.util.stream.Collectors.joining;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import com.ua.yushchenko.tabakabot.builder.ui.CustomButtonBuilder;
@@ -73,13 +74,14 @@ public class TobaccoOrderMenuBuilder {
 
 
     private String getReadableAllTobaccoItems(final List<Item> tobaccoItemsByType) {
+        final AtomicInteger counter = new AtomicInteger(1);
+
         return tobaccoItemsByType.stream()
-                                 .sorted(Comparator.comparing(Item::getItemId))
-                                 .map(TobaccoOrderMenuBuilder::buildTobaccoItemInfo)
+                                 .map(item ->  buildTobaccoItemInfo(counter.getAndIncrement(), item))
                                  .collect(joining("\n"));
     }
 
-    private static String buildTobaccoItemInfo(final Item item) {
-        return item.getItemId() + ") " + item.getDescription() + " (" + item.getWeight() + " г.)";
+    private static String buildTobaccoItemInfo(final int counter, final Item item) {
+        return counter + ") " + item.getDescription() + " (" + item.getWeight() + " г.)";
     }
 }
