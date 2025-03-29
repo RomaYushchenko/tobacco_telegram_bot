@@ -28,6 +28,7 @@ public class ClientCommandFactory {
     public ClientCommandFactory(final @NonNull StartCommand startCommand,
                                 final @NonNull Tobacco420LightCommand tobacco420LightCommand,
                                 final @NonNull Tobacco420ClassicCommand tobacco420ClassicCommand,
+                                final @NonNull YummyOrderListCommand yummyOrderListCommand,
                                 final @NonNull CoalCommand coalCommand,
                                 final @NonNull OrderListCommand orderListCommand,
                                 final @NonNull OrderCommand orderCommand,
@@ -42,6 +43,7 @@ public class ClientCommandFactory {
         commandMap.put(TobaccoBotCommand.START, startCommand);
         commandMap.put(TobaccoBotCommand.TABAKA_420_LIGHT, tobacco420LightCommand);
         commandMap.put(TobaccoBotCommand.TABAKA_420_CLASSIC, tobacco420ClassicCommand);
+        commandMap.put(TobaccoBotCommand.TOBACCO_YUMMY, yummyOrderListCommand);
         commandMap.put(TobaccoBotCommand.COAL, coalCommand);
         commandMap.put(TobaccoBotCommand.ORDER_LIST, orderListCommand);
         commandMap.put(TobaccoBotCommand.ORDER, orderCommand);
