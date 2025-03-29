@@ -46,10 +46,13 @@ public class TobaccoOrderMenuBuilder {
                                                  final TobaccoBotCommand tobaccoBotCommand) {
         log.info("buildTobaccoOrderMenu.E: Building Tobacco Order menu...");
 
-        final List<Item> items = itemService.getAvailableItemsByType(itemType);
+        final List<Item> items = itemService.getAvailableItemsByType(itemType)
+                                            .stream()
+                                            .sorted(Comparator.comparing(Item::getItemId))
+                                            .collect(Collectors.toList());
+
         final List<Long> itemIds = items.stream()
                                         .map(Item::getItemId)
-                                        .sorted()
                                         .collect(Collectors.toList());
 
         final var replyMarkup = InlineKeyboardMarkup.builder()
